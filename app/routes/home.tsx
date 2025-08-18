@@ -1,13 +1,15 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
-
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "CrossCribbs Multiplayer" },
+    { name: "description", content: "Multiplayer card game" },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold">CrossCribbs Multiplayer</h1>
+      <p className="mt-4 text-gray-600">Welcome to the game!</p>
+    </div>
+  );
 }

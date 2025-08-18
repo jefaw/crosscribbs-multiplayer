@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Test Client</title>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { margin: 5px; padding: 8px 16px; cursor: pointer; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Server Test Client</h1>
+    
+    <div class="test-section">
+        <h2>HTTP API Test</h2>
+        <button onclick="testHealthEndpoint()">Test Health Endpoint</button>
+        <div id="http-log" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Socket.IO Test</h2>
+        <button onclick="connectSocket()">Connect Socket</button>
+        <button onclick="disconnectSocket()">Disconnect Socket</button>
+        <button onclick="joinGame()">Join Game</button>
+        <div id="socket-log" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Connection Status</h2>
+        <div id="status">Not connected</div>
+    </div>
+
+    <script>
+        let socket;
+        
+        function log(message, type = 'info', target = 'http-log') {
+            const logDiv = document.getElementById(target);
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+        }
+        
+        async function testHealthEndpoint() {
+            try {
+                const response = await fetch('http://localhost:3001/api/health');
+                const data = await response.json();
+                log(`Health check response: ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                log(`Health check failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function connectSocket() {
+            if (socket) {
+                log('Socket already connected', 'info', 'socket-log');
+                return;
+            }
+            
+            socket = io('http://localhost:3001');
+            
+            socket.on('connect', () => {
+                log(`Connected with ID: ${socket.id}`, 'success', 'socket-log');
+                updateStatus('Connected');
+            });
+            
+            socket.on('disconnect', () => {
+                log('Disconnected from server', 'info', 'socket-log');
+                updateStatus('Disconnected');
+            });
+            
+            socket.on('connect_error', (error) => {
+                log(`Connection error: ${error.message}`, 'error', 'socket-log');
+                updateStatus('Connection Error');
+            });
+        }
+        
+        function disconnectSocket() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                log('Socket disconnected', 'info', 'socket-log');
+                updateStatus('Not connected');
+            }
+        }
+        
+        function joinGame() {
+            if (!socket) {
+                log('Socket not connected. Connect first.', 'error', 'socket-log');
+                return;
+            }
+            
+            const gameId = 'test-game-' + Date.now();
+            socket.emit('join-game', gameId);
+            log(`Attempting to join game: ${gameId}`, 'info', 'socket-log');
+        }
+        
+        function updateStatus(status) {
+            document.getElementById('status').textContent = status;
+        }
+        
+        // Auto-test on page load
+        window.onload = function() {
+            log('Test client loaded. Click buttons to test functionality.', 'info', 'http-log');
+        };
+    </script>
+</body>
+</html>
