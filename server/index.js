@@ -1,42 +1,44 @@
+// server/index.js
 import express from 'express';
-import cors from 'cors';
-import { createServer } from 'http';
+import http from 'http';
 import { Server } from 'socket.io';
 
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
+const server = http.createServer(app);
+const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Your React dev server
-    methods: ["GET", "POST"]
-  }
+    origin: 'http://localhost:5173', // Allow connections from your React app
+    methods: ['GET', 'POST'],
+  },
 });
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+const PORT = process.env.PORT || 4000;
 
-// Basic route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
-});
+// Simple game state for testing
+const gameState = {
+  message: 'Waiting for players...',
+};
 
-// Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-  
-  // Handle game events here
-  socket.on('join-game', (gameId) => {
-    socket.join(gameId);
-    console.log(`User ${socket.id} joined game ${gameId}`);
+  console.log(`User connected: ${socket.id}`);
+
+  // Send the current game state to the new user
+  socket.emit('gameStateUpdate', gameState);
+
+  // Listen for a test message from the client
+  socket.on('sendMessage', (data) => {
+    console.log(`Received message from ${socket.id}: ${data}`);
+    // Update the game state with the received message
+    gameState.message = `Player ${socket.id} says: ${data}`;
+    // Broadcast the updated state to all connected clients
+    io.emit('gameStateUpdate', gameState);
   });
-  
+
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log(`User disconnected: ${socket.id}`);
   });
 });
 
-const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
