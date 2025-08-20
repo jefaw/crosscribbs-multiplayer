@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "echo \"No tests specified\" && exit 1"
+    "test": "node test-gameController.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
