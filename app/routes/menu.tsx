@@ -23,36 +23,43 @@ export default function GameSetup() {
   };
 
   return (
-    <div>
-      {currentPage === "gameType" && (
-        <LocalOrOnline
-          onSelect={(type) => {
-            setGameType(type);
-            goToNextPage("numPlayers");
-          }}
-        />
-      )}
-      {currentPage === "numPlayers" && (
-        <NumPlayers
-          onSelect={(numPlayers) => {
-            setNumPlayers(numPlayers);
-            goToNextPage("playerSetup");
-          }}
-          onBack={goBack}
-        />
-      )}
-      {currentPage === "playerSetup" && (
-        <PlayerSetup
-          numPlayers={numPlayers}
-          onSetPlayerNames={(playerNames) => {
-            setPlayerNames(playerNames);
-            navigate("/game", {
-              state: { gameType, numPlayers, playerNames },
-            });
-          }}
-          onBack={goBack}
-        />
-      )}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-800 p-4">
+      <div className="text-center mb-12">
+        <h1 className="text-6xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-fuchsia-400 text-transparent bg-clip-text">
+          Cross Cribbs
+        </h1>
+      </div>
+      <div className="bg-slate-700 p-8 rounded-lg shadow-xl w-[400px]">
+        {currentPage === "gameType" && (
+          <LocalOrOnline
+            onSelect={(type) => {
+              setGameType(type);
+              goToNextPage("numPlayers");
+            }}
+          />
+        )}
+        {currentPage === "numPlayers" && (
+          <NumPlayers
+            onSelect={(numPlayers) => {
+              setNumPlayers(numPlayers);
+              goToNextPage("playerSetup");
+            }}
+            onBack={goBack}
+          />
+        )}
+        {currentPage === "playerSetup" && (
+          <PlayerSetup
+            numPlayers={numPlayers}
+            onSetPlayerNames={(playerNames) => {
+              setPlayerNames(playerNames);
+              navigate("/game", {
+                state: { gameType, numPlayers, playerNames },
+              });
+            }}
+            onBack={goBack}
+          />
+        )}
+      </div>
     </div>
   );
 }
