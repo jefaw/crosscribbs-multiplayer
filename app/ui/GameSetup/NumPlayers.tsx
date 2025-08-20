@@ -1,0 +1,31 @@
+type ChildProps = {
+  onSelect: (onSelect: 2 | 4) => void;
+  onBack: () => void;
+};
+
+export default function NumPlayers({ onSelect, onBack }: ChildProps) {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-white mb-6">Select Game Mode</h2>
+      <button
+        onClick={() => onSelect(2)}
+        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
+      >
+        1v1
+      </button>
+      <button
+        onClick={() => onSelect(4)}
+        className="w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-lg text-lg opacity-50 cursor-not-allowed"
+        disabled
+      >
+        2v2 (Coming Soon)
+      </button>
+      <button
+        onClick={() => onBack()}
+        className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-base transition-colors duration-200"
+      >
+        Back
+      </button>
+    </div>
+  );
+}
