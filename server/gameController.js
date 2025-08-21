@@ -77,8 +77,8 @@ class GameController {
     // Update spots left
     this.numSpotsLeft--;
     
-    // Check if round is over
-    if (this.numSpotsLeft <= 1) {
+  // Check if round is over (only when no spots remain)
+  if (this.numSpotsLeft <= 0) {
       this.roundOver = true;
       this.handleRoundEnd();
     }

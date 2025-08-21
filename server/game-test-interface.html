@@ -425,9 +425,7 @@
         // Import the actual game controller classes
         import GameController from './gameController.js';
         
-        let gameController;
-        let selectedCard = null;
-        let selectedPlayer = null;
+    let gameController;
     
         // Initialize the game interface
         async function initializeGame() {
@@ -516,75 +514,94 @@
             renderHand('player1Hand', gameController.hand1, 1);
             renderHand('player2Hand', gameController.hand2, 2);
         }
-    
+
         function renderHand(handId, cards, playerNum) {
             const handElement = document.getElementById(handId);
             handElement.innerHTML = '';
-            
-            cards.forEach((card, index) => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'card';
-                
-                const img = document.createElement('img');
-                img.src = card.frontImgSrc;
-                img.alt = `${card.name} of ${card.suit}`;
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.objectFit = 'contain';
-                cardElement.appendChild(img);
-                
-                if (gameController.turn === playerNum) {
-                    cardElement.onclick = (event) => selectCard(card, playerNum, event);
-                } else {
-                    cardElement.classList.add('played');
-                }
-                
-                handElement.appendChild(cardElement);
-            });
+
+            // If no cards, show placeholder
+            if (!cards || cards.length === 0) {
+                const emptyEl = document.createElement('div');
+                emptyEl.className = 'card played';
+                emptyEl.textContent = 'Empty';
+                handElement.appendChild(emptyEl);
+                return;
+            }
+
+            // Render only the top card (assumed to be the last element)
+            const topCard = cards[cards.length - 1];
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            cardElement.style.position = 'relative'; // for stack badge
+
+            const img = document.createElement('img');
+            img.src = topCard.frontImgSrc;
+            img.alt = `${topCard.name} of ${topCard.suit}`;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            cardElement.appendChild(img);
+
+            // No click handler on hand cards — playing is done by clicking board cells
+            if (gameController.turn !== playerNum) {
+                cardElement.classList.add('played');
+            }
+
+            // If there are more cards underneath, show a small counter badge
+            if (cards.length > 1) {
+                const badge = document.createElement('div');
+                badge.style.position = 'absolute';
+                badge.style.top = '6px';
+                badge.style.right = '6px';
+                badge.style.background = 'rgba(0,0,0,0.65)';
+                badge.style.color = 'white';
+                badge.style.padding = '2px 6px';
+                badge.style.borderRadius = '999px';
+                badge.style.fontSize = '0.75em';
+                badge.textContent = `${cards.length}`;
+                cardElement.appendChild(badge);
+            }
+
+            handElement.appendChild(cardElement);
         }
-    
+
         // ------------------------
         // Game Logic
         // ------------------------
-        function selectCard(card, player, event) {
-            if (gameController.turn !== player) return;
-            
-            selectedCard = card;
-            selectedPlayer = player;
-            
-            gameController.selectCard(player, card);
-            
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-            
-            log(`Player ${player} selected card: ${card.name} of ${card.suit}`, 'info');
-        }
-    
         function playCard(row, col) {
-            if (!selectedCard || !selectedPlayer || gameController.turn !== selectedPlayer) {
-                log('Please select a card first!', 'warning');
+            const currentPlayer = gameController.turn;
+            const hand = currentPlayer === 1 ? gameController.hand1 : gameController.hand2;
+            if (!hand || hand.length === 0) {
+                log('No cards available to play!', 'warning');
                 return;
             }
-            
+
+            // Auto-select top card for current player (controller may not need explicit select)
+            const topCard = hand[hand.length - 1];
+            if (typeof gameController.selectCard === 'function') {
+                try {
+                    gameController.selectCard(currentPlayer, topCard);
+                } catch (e) {
+                    // ignore if controller doesn't need explicit select
+                }
+            }
+
             if (gameController.board[row][col] !== null) {
                 log('Invalid move: Position already occupied', 'error');
                 return;
             }
-            
+
             const success = gameController.playCard([row, col]);
-            
+
             if (success) {
-                selectedCard = null;
-                selectedPlayer = null;
-                
                 renderBoard();
                 renderHands();
                 updateGameInfo();
                 updateTurnIndicator();
-                
+
                 log(`Card played at [${row}, ${col}]`, 'success');
                 printBoardGrid();
-                
+
                 if (gameController.roundOver) {
                     endRound();
                 }

@@ -61,7 +61,7 @@ function calculateScore(board) {
     let runScore = 0;
     let fifteenScore = 0;
 
-    // console.log(row);
+    console.log(row);
 
     // Count occurrences of elements in the row
     const m = {};
@@ -115,12 +115,12 @@ function calculateScore(board) {
     fifteenTotal += fifteenScore;
     rowScore = pairScore + runScore + fifteenScore;
     score += rowScore;
-    // console.log(`Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) = ${rowScore}`);
+    console.log(`Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) = ${rowScore}`);
 
     rowScore = 0;
 
-    // console.log(`Running total: ${score}`);
-    // console.log("-------------------------------------------------------");
+    console.log(`Running total: ${score}`);
+    console.log("-------------------------------------------------------");
     // Can display row scores as sum of scores for pairs, runs, etc. For viewability
     // Can keep total scores for pairs and runs as well
   }
