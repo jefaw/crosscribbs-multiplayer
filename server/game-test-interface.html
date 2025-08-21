@@ -66,11 +66,16 @@
             background: white;
             border: 2px solid #bdc3c7;
             border-radius: 10px;
-            padding: 15px;
+            padding: 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            width: 80px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .card:hover {
@@ -101,7 +106,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            max-width: 400px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
@@ -118,6 +123,8 @@
             font-weight: bold;
             color: white;
             font-size: 0.9em;
+            min-width: 60px;
+            min-height: 60px;
         }
 
         .board-cell:hover {
@@ -415,73 +422,52 @@
     </div>
 
     <script type="module">
-        // Import the game controller (you'll need to serve this file from your server)
+        // Import the actual game controller classes
+        import GameController from './gameController.js';
+        
         let gameController;
         let selectedCard = null;
         let selectedPlayer = null;
-
+    
         // Initialize the game interface
         async function initializeGame() {
             try {
-                // Try to import the game controller
                 const response = await fetch('/api/game/state');
                 if (response.ok) {
                     const gameState = await response.json();
                     updateInterface(gameState);
+                    // Make sure we still create the controller
+                    createActualGame();
                 } else {
-                    // Fallback to mock data for testing
-                    createMockGame();
+                    createActualGame();
                 }
             } catch (error) {
-                console.log('Using mock game data for testing');
-                createMockGame();
+                console.log('Using actual game controller for testing');
+                createActualGame();
             }
-            
+        }
+    
+        function updateInterface(gameState) {
+            if (gameState) {
+                log('Received game state from server', 'info');
+            }
+        }
+    
+        function createActualGame() {
+            // Create an actual game controller instance
+            gameController = new GameController(2);
+    
+            // Update the interface to reflect the actual game state
             renderBoard();
             renderHands();
             updateGameInfo();
+            updateTurnIndicator();
+            printBoardGrid();
         }
-
-        function createMockGame() {
-            // Create a mock game controller for testing
-            // The deck would have 52 cards, but we're simulating the distribution
-            const deck = ['A♠', 'K♠', 'Q♠', 'J♠', '10♠', '9♠', '8♠', '7♠', '6♠', '5♠', '4♠', '3♠', '2♠',
-                         'A♥', 'K♥', 'Q♥', 'J♥', '10♥', '9♥', '8♥', '7♥', '6♥', '5♥', '4♥', '3♥', '2♥',
-                         'A♦', 'K♦', 'Q♦', 'J♦', '10♦', '9♦', '8♦', '7♦', '6♦', '5♦', '4♦', '3♦', '2♦',
-                         'A♣', 'K♣', 'Q♣', 'J♣', '10♣', '9♣', '8♣', '7♣', '6♣', '5♣', '4♣', '3♣', '2♣'];
-            
-            // Shuffle and distribute cards
-            const shuffled = [...deck].sort(() => Math.random() - 0.5);
-            
-            // First card goes to center
-            const centerCard = shuffled[0];
-            
-            // Next 12 cards go to Player 1
-            const hand1 = shuffled.slice(1, 13);
-            
-            // Next 12 cards go to Player 2
-            const hand2 = shuffled.slice(13, 25);
-            
-            gameController = {
-                board: Array(5).fill().map(() => Array(5).fill(null)),
-                hand1: hand1,
-                hand2: hand2,
-                turn: 1,
-                selectedCard: hand1[hand1.length - 1], // Last card in hand
-                roundScoreVisible: false,
-                roundScores: [],
-                totalScores: [0, 0],
-                gameOver: false,
-                winner: null,
-                roundHistory: [],
-                currentRound: 1,
-                numSpotsLeft: 24
-            };
-            
-            // Set center card from deck
-            gameController.board[2][2] = centerCard;
-        }
-
+    
+        // ------------------------
+        // Rendering Functions
+        // ------------------------
         function renderBoard() {
             const board = document.getElementById('gameBoard');
             board.innerHTML = '';
@@ -493,10 +479,28 @@
                     
                     if (row === 2 && col === 2) {
                         cell.className += ' center';
-                        cell.textContent = gameController.board[row][col] || '★';
+                        if (gameController.board[row][col]) {
+                            const card = gameController.board[row][col];
+                            const img = document.createElement('img');
+                            img.src = card.frontImgSrc;
+                            img.alt = `${card.name} of ${card.suit}`;
+                            img.style.width = '100%';
+                            img.style.height = '100%';
+                            img.style.objectFit = 'contain';
+                            cell.appendChild(img);
+                        } else {
+                            cell.textContent = '★';
+                        }
                     } else if (gameController.board[row][col]) {
                         cell.className += ' occupied';
-                        cell.textContent = gameController.board[row][col];
+                        const card = gameController.board[row][col];
+                        const img = document.createElement('img');
+                        img.src = card.frontImgSrc;
+                        img.alt = `${card.name} of ${card.suit}`;
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'contain';
+                        cell.appendChild(img);
                     } else {
                         cell.className += ' available';
                         cell.textContent = '•';
@@ -507,12 +511,12 @@
                 }
             }
         }
-
+    
         function renderHands() {
             renderHand('player1Hand', gameController.hand1, 1);
             renderHand('player2Hand', gameController.hand2, 2);
         }
-
+    
         function renderHand(handId, cards, playerNum) {
             const handElement = document.getElementById(handId);
             handElement.innerHTML = '';
@@ -520,10 +524,17 @@
             cards.forEach((card, index) => {
                 const cardElement = document.createElement('div');
                 cardElement.className = 'card';
-                cardElement.textContent = card;
+                
+                const img = document.createElement('img');
+                img.src = card.frontImgSrc;
+                img.alt = `${card.name} of ${card.suit}`;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain';
+                cardElement.appendChild(img);
                 
                 if (gameController.turn === playerNum) {
-                    cardElement.onclick = () => selectCard(card, playerNum);
+                    cardElement.onclick = (event) => selectCard(card, playerNum, event);
                 } else {
                     cardElement.classList.add('played');
                 }
@@ -531,20 +542,24 @@
                 handElement.appendChild(cardElement);
             });
         }
-
-        function selectCard(card, player) {
+    
+        // ------------------------
+        // Game Logic
+        // ------------------------
+        function selectCard(card, player, event) {
             if (gameController.turn !== player) return;
             
             selectedCard = card;
             selectedPlayer = player;
             
-            // Update visual selection
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-            event.target.classList.add('selected');
+            gameController.selectCard(player, card);
             
-            log(`Player ${player} selected card: ${card}`, 'info');
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            log(`Player ${player} selected card: ${card.name} of ${card.suit}`, 'info');
         }
-
+    
         function playCard(row, col) {
             if (!selectedCard || !selectedPlayer || gameController.turn !== selectedPlayer) {
                 log('Please select a card first!', 'warning');
@@ -556,124 +571,77 @@
                 return;
             }
             
-            // Simulate playing the card
-            gameController.board[row][col] = selectedCard;
+            const success = gameController.playCard([row, col]);
             
-            // Remove card from hand
-            if (selectedPlayer === 1) {
-                const index = gameController.hand1.indexOf(selectedCard);
-                if (index > -1) {
-                    gameController.hand1.splice(index, 1);
+            if (success) {
+                selectedCard = null;
+                selectedPlayer = null;
+                
+                renderBoard();
+                renderHands();
+                updateGameInfo();
+                updateTurnIndicator();
+                
+                log(`Card played at [${row}, ${col}]`, 'success');
+                printBoardGrid();
+                
+                if (gameController.roundOver) {
+                    endRound();
                 }
             } else {
-                const index = gameController.hand2.indexOf(selectedCard);
-                if (index > -1) {
-                    gameController.hand2.splice(index, 1);
-                }
-            }
-            
-            // Switch turns
-            gameController.turn = gameController.turn === 1 ? 2 : 1;
-            gameController.numSpotsLeft--;
-            
-            // Update selected card for next player
-            updateSelectedCard();
-            
-            // Clear selection
-            selectedCard = null;
-            selectedPlayer = null;
-            
-            // Update interface
-            renderBoard();
-            renderHands();
-            updateGameInfo();
-            updateTurnIndicator();
-            
-            log(`Player ${selectedPlayer || 'Unknown'} played ${selectedCard || 'Unknown'} at [${row}, ${col}]`, 'success');
-            
-            // Check if round is over
-            if (gameController.numSpotsLeft <= 1) {
-                endRound();
+                log('Failed to play card', 'error');
             }
         }
-
-        function updateSelectedCard() {
-            if (gameController.turn === 1 && gameController.hand1.length > 0) {
-                gameController.selectedCard = gameController.hand1[gameController.hand1.length - 1];
-            } else if (gameController.turn === 2 && gameController.hand2.length > 0) {
-                gameController.selectedCard = gameController.hand2[gameController.hand2.length - 1];
-            } else {
-                gameController.selectedCard = null;
-            }
-        }
-
+    
         function endRound() {
-            gameController.roundOver = true;
             log('Round ended! Calculating scores...', 'info');
             
-            // Simulate score calculation
-            const rowScore = Math.floor(Math.random() * 20) + 10;
-            const colScore = Math.floor(Math.random() * 20) + 10;
-            
-            gameController.roundScores = [
-                { total: () => rowScore },
-                { total: () => colScore }
-            ];
-            
-            if (rowScore >= colScore) {
-                gameController.totalScores[0] += (rowScore - colScore);
-            } else {
-                gameController.totalScores[1] += (colScore - rowScore);
-            }
-            
             updateGameInfo();
-            log(`Round scores - Row: ${rowScore}, Column: ${colScore}`, 'success');
+            
+            if (gameController.roundScores && gameController.roundScores.length > 0) {
+                const rowScore = gameController.roundScores[0].total();
+                const colScore = gameController.roundScores[1].total();
+                log(`Round scores - Row: ${rowScore}, Column: ${colScore}`, 'success');
+                
+                if (gameController.gameOver) {
+                    log(`Game Over! ${gameController.winner} wins with ${Math.max(...gameController.totalScores)} points!`, 'success');
+                }
+            }
         }
-
+    
+        // ------------------------
+        // Utility Functions
+        // ------------------------
         function resetGame() {
-            createMockGame();
+            gameController.resetGame();
             renderBoard();
             renderHands();
             updateGameInfo();
             updateTurnIndicator();
             log('Game reset!', 'info');
+            printBoardGrid();
         }
-
+    
         function nextRound() {
             if (!gameController.roundOver) {
                 log('Current round is not finished yet!', 'warning');
                 return;
             }
             
-            gameController.currentRound++;
-            gameController.roundOver = false;
-            gameController.numSpotsLeft = 24;
-            gameController.board = Array(5).fill().map(() => Array(5).fill(null));
+            const success = gameController.nextRound();
             
-            // Create new deck and distribute cards properly
-            const deck = ['A♠', 'K♠', 'Q♠', 'J♠', '10♠', '9♠', '8♠', '7♠', '6♠', '5♠', '4♠', '3♠', '2♠',
-                         'A♥', 'K♥', 'Q♥', 'J♥', '10♥', '9♥', '8♥', '7♥', '6♥', '5♥', '4♥', '3♥', '2♥',
-                         'A♦', 'K♦', 'Q♦', 'J♦', '10♦', '9♦', '8♦', '7♦', '6♦', '5♦', '4♦', '3♦', '2♦',
-                         'A♣', 'K♣', 'Q♣', 'J♣', '10♣', '9♣', '8♣', '7♣', '6♣', '5♣', '4♣', '3♣', '2♣'];
-            
-            const shuffled = [...deck].sort(() => Math.random() - 0.5);
-            const centerCard = shuffled[0];
-            const hand1 = shuffled.slice(1, 13);
-            const hand2 = shuffled.slice(13, 25);
-            
-            gameController.board[2][2] = centerCard;
-            gameController.hand1 = hand1;
-            gameController.hand2 = hand2;
-            gameController.turn = 1;
-            gameController.selectedCard = hand1[hand1.length - 1];
-            
-            renderBoard();
-            renderHands();
-            updateGameInfo();
-            updateTurnIndicator();
-            log(`Starting round ${gameController.currentRound}`, 'success');
+            if (success) {
+                renderBoard();
+                renderHands();
+                updateGameInfo();
+                updateTurnIndicator();
+                log(`Starting round ${gameController.currentRound}`, 'success');
+                printBoardGrid();
+            } else {
+                log('Cannot start next round - game is over!', 'warning');
+            }
         }
-
+    
         function showScores() {
             const scoresSection = document.getElementById('scoresSection');
             scoresSection.style.display = scoresSection.style.display === 'none' ? 'block' : 'none';
@@ -682,13 +650,12 @@
                 renderScores();
             }
         }
-
+    
         function renderScores() {
-            // Render row scores
             const rowScores = document.getElementById('rowScores');
             rowScores.innerHTML = '';
             
-            if (gameController.roundScores.length > 0) {
+            if (gameController.roundScores && gameController.roundScores.length > 0) {
                 const rowScore = gameController.roundScores[0].total();
                 const scoreItem = document.createElement('div');
                 scoreItem.className = 'score-item';
@@ -696,11 +663,10 @@
                 rowScores.appendChild(scoreItem);
             }
             
-            // Render column scores
             const columnScores = document.getElementById('columnScores');
             columnScores.innerHTML = '';
             
-            if (gameController.roundScores.length > 0) {
+            if (gameController.roundScores && gameController.roundScores.length > 0) {
                 const colScore = gameController.roundScores[1].total();
                 const scoreItem = document.createElement('div');
                 scoreItem.className = 'score-item';
@@ -708,20 +674,20 @@
                 columnScores.appendChild(scoreItem);
             }
         }
-
+    
         function updateGameInfo() {
             document.getElementById('currentRound').textContent = gameController.currentRound;
             document.getElementById('spotsLeft').textContent = gameController.numSpotsLeft;
             document.getElementById('rowScore').textContent = gameController.totalScores[0];
             document.getElementById('columnScore').textContent = gameController.totalScores[1];
         }
-
+    
         function updateTurnIndicator() {
             const indicator = document.getElementById('turnIndicator');
             indicator.textContent = `Player ${gameController.turn}'s Turn`;
             indicator.className = `turn-indicator player${gameController.turn}`;
         }
-
+    
         function log(message, type = 'info') {
             const logElement = document.getElementById('gameLog');
             const logEntry = document.createElement('div');
@@ -730,11 +696,31 @@
             logElement.appendChild(logEntry);
             logElement.scrollTop = logElement.scrollHeight;
         }
-
+    
         function clearLog() {
             document.getElementById('gameLog').innerHTML = '';
         }
-
+    
+        function printBoardGrid() {
+            log('=== BOARD GRID AFTER TURN ===', 'info');
+            let gridString = '';
+            
+            for (let row = 0; row < 5; row++) {
+                let rowString = '';
+                for (let col = 0; col < 5; col++) {
+                    const cell = gameController.board[row][col];
+                    if (cell === null) {
+                        rowString += '[ ]';
+                    } else {
+                        rowString += `[${cell.name}${cell.suit.charAt(0).toUpperCase()}]`;
+                    }
+                    rowString += ' ';
+                }
+                log(rowString.trim(), 'info');
+            }
+            log('=============================', 'info');
+        }
+    
         // Initialize the game when the page loads
         window.addEventListener('load', initializeGame);
         
@@ -744,5 +730,6 @@
         window.showScores = showScores;
         window.clearLog = clearLog;
     </script>
+    
 </body>
 </html>
