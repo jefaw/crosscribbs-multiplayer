@@ -1,16 +1,27 @@
-/*
-- State management for:
-  - deck: The shuffled deck of cards
-  - board: 5x5 grid of card placements
-  - hand1/hand2: Players' cards
-  - turn: Current player's turn
-  - selectedCard: Currently selected card
-  - scores: Both round and total scores
-*/
+import type { BoardType, GameStateType, RoundHistoryType } from "@shared/types/GameControllerTypes.js";
+import { newBoard, newDeck, tallyScores } from "./classes/Helpers.js";
+import type { CardType } from "@shared/types/CardType.js";
+import type { ScoreType } from "@shared/types/ScoreType.js";
+// import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 
-import { newBoard, newDeck, tallyScores } from "./Helpers.js";
+export default class GameController {
+  numPlayers: number;
+  deck: CardType[] | null;
+  board: BoardType;
+  hand1: CardType[];
+  hand2: CardType[];
+  turn: number;
+  selectedCard: CardType | null;
+  roundScoreVisible: boolean;
+  numSpotsLeft: number;
+  roundScores: ScoreType[] | null; // refine based on tallyScores return type
+  totalScores: [number, number];
+  roundOver: boolean;
+  gameOver: boolean;
+  winner: "Row" | "Column" | null;
+  roundHistory: RoundHistoryType[];
+  currentRound: number;
 
-class GameController {
   constructor(numPlayers = 2) {
     this.numPlayers = numPlayers;
     this.deck = null;
@@ -21,7 +32,7 @@ class GameController {
     this.selectedCard = null;
     this.roundScoreVisible = false;
     this.numSpotsLeft = 24;
-    this.roundScores = [];
+    this.roundScores = null;
     this.totalScores = [0, 0];
     this.roundOver = false;
     this.gameOver = false;
@@ -33,92 +44,63 @@ class GameController {
     this.initializeGame();
   }
 
-  // Initialize the game
-  initializeGame() {
+  initializeGame(): void {
     this.deck = newDeck();
-
-    // Set center card
     this.board[2][2] = this.deck[0];
-
-    // Set player hands
-    this.hand1 = this.deck.slice(1, 13);
-    this.hand2 = this.deck.slice(13, 25);
-
-    // Set initial selected card
+    this.hand1 = this.deck?.slice(1, 13) || [];
+    this.hand2 = this.deck?.slice(13, 25) || [];
     this.selectedCard = this.hand1[this.hand1.length - 1];
   }
 
-  // Select a card for a player
-  selectCard(player, card) {
+  selectCard(player: number, card: CardType): boolean {
     if (player !== this.turn) return false;
     this.selectedCard = card;
     return true;
   }
 
-  // Play a card at a specific position
-  playCard(pos) {
+  playCard(pos: [number, number]): boolean {
     if (!this.selectedCard) return false;
-
     const [r, c] = pos;
-
-    // Display new card on the board FIRST
     this.board[r][c] = this.selectedCard;
 
-    // Remove card from player's hand AFTER placing it
     if (this.turn === 1) {
-      this.hand1 = this.hand1.slice(0, -1);
+      this.hand1.pop();
     } else if (this.turn === 2) {
-      this.hand2 = this.hand2.slice(0, -1);
+      this.hand2.pop();
     }
 
-    // Clear selected card AFTER placing it
     this.selectedCard = null;
-
-    // Update spots left
     this.numSpotsLeft--;
 
-    // Check if round is over (only when no spots remain)
     if (this.numSpotsLeft <= 0) {
       this.roundOver = true;
       this.handleRoundEnd();
     }
 
-    // Switch turns
     this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
-
-    // Set selected card for next player
     this.updateSelectedCard();
 
     return true;
   }
 
-  // Update selected card based on current turn
-  updateSelectedCard() {
-    let hand;
-    if (this.turn === 1) {
-      hand = this.hand1;
-    } else if (this.turn === 2) {
-      hand = this.hand2;
-    }
+  updateSelectedCard(): void {
+    let hand: CardType[];
+    if (this.turn === 1) hand = this.hand1;
+    else if (this.turn === 2) hand = this.hand2;
+    else hand = [];
 
     this.selectedCard = hand.length > 0 ? hand[hand.length - 1] : null;
   }
 
-  // Handle round end
-  handleRoundEnd() {
+  handleRoundEnd(): void {
     this.roundScoreVisible = true;
-
-    // Update round score
     this.roundScores = tallyScores(this.board);
-
-    // Calculate round points
     const [rowRoundScore, columnRoundScore] = this.roundScores;
     const rowPoints = rowRoundScore.total();
     const columnPoints = columnRoundScore.total();
     const pointDiff = Math.abs(rowPoints - columnPoints);
-    const roundWinner = rowPoints >= columnPoints ? "Row" : "Column";
+    const roundWinner: "Row" | "Column" = rowPoints >= columnPoints ? "Row" : "Column";
 
-    // Add round to history
     this.roundHistory.push({
       round: this.currentRound,
       rowScore: rowPoints,
@@ -127,14 +109,9 @@ class GameController {
       winner: roundWinner,
     });
 
-    // Update total score
-    if (rowPoints >= columnPoints) {
-      this.totalScores[0] += pointDiff;
-    } else {
-      this.totalScores[1] += pointDiff;
-    }
+    if (rowPoints >= columnPoints) this.totalScores[0] += pointDiff;
+    else this.totalScores[1] += pointDiff;
 
-    // Check for game over condition (31 points)
     if (this.totalScores[0] >= 31) {
       this.gameOver = true;
       this.winner = "Row";
@@ -144,25 +121,19 @@ class GameController {
     }
   }
 
-  // Start next round
-  nextRound() {
+  nextRound(): boolean {
     if (this.gameOver) return false;
-
     this.board = newBoard();
     this.roundScoreVisible = false;
     this.numSpotsLeft = 24;
     this.roundOver = false;
     this.deck = newDeck();
     this.currentRound++;
-
-    // Reinitialize the game
     this.initializeGame();
-
     return true;
   }
 
-  // Reset the entire game
-  resetGame() {
+  resetGame(): void {
     this.board = newBoard();
     this.roundScoreVisible = false;
     this.numSpotsLeft = 24;
@@ -173,13 +144,10 @@ class GameController {
     this.deck = newDeck();
     this.roundHistory = [];
     this.currentRound = 1;
-
-    // Reinitialize the game
     this.initializeGame();
   }
 
-  // Get current game state
-  getGameState() {
+  getGameState(): GameStateType {
     return {
       board: this.board,
       turn: this.turn,
@@ -197,24 +165,18 @@ class GameController {
     };
   }
 
-  // Check if a move is valid
-  isValidMove(pos) {
+  isValidMove(pos: [number, number]): boolean {
     const [r, c] = pos;
     return r >= 0 && r < 5 && c >= 0 && c < 5 && this.board[r][c] === null;
   }
 
-  // Get available moves for current player
-  getAvailableMoves() {
-    const moves = [];
+  getAvailableMoves(): [number, number][] {
+    const moves: [number, number][] = [];
     for (let i = 0; i < 5; i++) {
       for (let j = 0; j < 5; j++) {
-        if (this.board[i][j] === null) {
-          moves.push([i, j]);
-        }
+        if (this.board[i][j] === null) moves.push([i, j]);
       }
     }
     return moves;
   }
 }
-
-export default GameController;

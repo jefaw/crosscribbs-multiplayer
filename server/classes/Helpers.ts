@@ -1,8 +1,10 @@
-import Card from "./Card.js";
-import Score from "./Score.js";
+import Card from "@shared/classes/Card";
+import Score from "./Score";
+import type { CardType, CardValue } from "@shared/types/CardType";
+import type { BoardType } from "@shared/types/GameControllerTypes";
 
 function newBoard() {
-  let board = [];
+  let board: BoardType = [];
   for (let r = 0; r < 5; r++) {
     let row = [];
     for (let c = 0; c < 5; c++) {
@@ -14,7 +16,7 @@ function newBoard() {
 }
 
 //Fishman-yeetes shuffle deck alg
-function shuffleDeck(originalArray) {
+function shuffleDeck(originalArray: CardType[]) {
   const newArray = [...originalArray]; // Create a copy to avoid modifying the original array
 
   for (let i = newArray.length - 1; i > 0; i--) {
@@ -41,7 +43,7 @@ function newDeck() {
 export { newBoard, newDeck, tallyScores };
 
 //Scoring
-function tallyScores(board) {
+function tallyScores(board: BoardType) {
   const rowScore = calculateScore(board);
   const colScore = calculateScore(transpose(board));
 
@@ -49,7 +51,7 @@ function tallyScores(board) {
 }
 
 //returns a score object
-function calculateScore(board) {
+function calculateScore(board: BoardType) {
   let score = 0;
   let pairTotal = 0;
   let runTotal = 0;
@@ -64,9 +66,10 @@ function calculateScore(board) {
     console.log(row);
 
     // Count occurrences of elements in the row
-    const m = {};
+    const m: Record<number, number> = {};
     for (let i = 0; i < row.length; i++) {
-      const n = row[i].value;
+      const n = row[i]?.value;
+      if (!n) continue;
       m[n] = (m[n] || 0) + 1;
     }
     // console.log(`ROW COUNTS: ${JSON.stringify(m)}`);
@@ -78,6 +81,7 @@ function calculateScore(board) {
 
     // Iterate through the occurrences
     for (const [key, value] of Object.entries(m)) {
+      const numKey = Number(key); // cast string to number
       // Calculate pairs score
       if (value > 1) {
         if (value === 2) pairScore += 2;
@@ -89,7 +93,7 @@ function calculateScore(board) {
       let maxrun = 1;
       let multiplier = value;
 
-      if (!(key - 1 in m)) {
+      if (!(numKey - 1 in m)) {
         let run = 1;
 
         while (parseInt(key) + run in m) {
@@ -115,7 +119,9 @@ function calculateScore(board) {
     fifteenTotal += fifteenScore;
     rowScore = pairScore + runScore + fifteenScore;
     score += rowScore;
-    console.log(`Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) = ${rowScore}`);
+    console.log(
+      `Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) = ${rowScore}`
+    );
 
     rowScore = 0;
 
@@ -129,10 +135,10 @@ function calculateScore(board) {
   return scoreTotals;
 }
 
-function calculateFifteen(array, targetSum = 15) {
-  let result = [];
+function calculateFifteen(array: (CardType | null)[], targetSum = 15) {
+  let result: CardValue[][] = [];
 
-  function subsetSumsHelper(currentSum, startIndex, path) {
+  function subsetSumsHelper(currentSum: number, startIndex: number, path: CardValue[]) {
     if (currentSum === targetSum) {
       // console.log("15 Combination found:", path);
       result.push([...path]);
@@ -140,9 +146,10 @@ function calculateFifteen(array, targetSum = 15) {
     }
 
     for (let i = startIndex; i < array.length; i++) {
-      if (currentSum + Math.min(array[i].value, 10) <= targetSum) {
+      if (!array[i]) return;
+      if (currentSum + Math.min(array[i]!.value, 10) <= targetSum) {
         // Faces count as 10
-        subsetSumsHelper(currentSum + Math.min(array[i].value, 10), i + 1, [...path, array[i].value]);
+        subsetSumsHelper(currentSum + Math.min(array[i]!.value, 10), i + 1, [...path, array[i]!.value]);
       }
     }
   }
@@ -150,7 +157,7 @@ function calculateFifteen(array, targetSum = 15) {
   return result;
 }
 
-function transpose(board) {
+function transpose(board: BoardType) {
   //turn rows into col
   const boardTransposed = board[0].map((_, colIndex) => board.map((row) => row[colIndex]));
 

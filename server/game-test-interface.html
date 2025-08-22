@@ -1,752 +1,766 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CrossCribbs Game Testing Interface</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
 
+      .game-section {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .player-hand {
+        background: #ecf0f1;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .player-hand h3 {
+        color: #34495e;
+        margin-bottom: 15px;
+        text-align: center;
+        font-size: 1.3em;
+      }
+
+      .hand-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .card {
+        background: white;
+        border: 2px solid #bdc3c7;
+        border-radius: 10px;
+        padding: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        width: 80px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        border-color: #3498db;
+      }
+
+      .card.selected {
+        border-color: #e74c3c;
+        background: #fdf2f2;
+        transform: scale(1.05);
+      }
+
+      .card.played {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .game-board {
+        background: #2c3e50;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .board-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .board-cell {
+        aspect-ratio: 1;
+        background: #34495e;
+        border: 2px solid #2c3e50;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        color: white;
+        font-size: 0.9em;
+        min-width: 60px;
+        min-height: 60px;
+      }
+
+      .board-cell:hover {
+        background: #3498db;
+        transform: scale(1.05);
+      }
+
+      .board-cell.available {
+        background: #27ae60;
+        border-color: #2ecc71;
+      }
+
+      .board-cell.occupied {
+        background: #e67e22;
+        border-color: #f39c12;
+      }
+
+      .board-cell.center {
+        background: #e74c3c;
+        border-color: #c0392b;
+      }
+
+      .controls {
+        background: #ecf0f1;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .controls h3 {
+        color: #34495e;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .control-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-primary {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      .btn-success {
+        background: #27ae60;
+        color: white;
+      }
+
+      .btn-success:hover {
+        background: #229954;
+        transform: translateY(-2px);
+      }
+
+      .btn-warning {
+        background: #f39c12;
+        color: white;
+      }
+
+      .btn-warning:hover {
+        background: #e67e22;
+        transform: translateY(-2px);
+      }
+
+      .btn-danger {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+      }
+
+      .game-info {
+        background: #34495e;
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .info-item {
+        text-align: center;
+      }
+
+      .info-label {
+        font-size: 0.9em;
+        color: #bdc3c7;
+        margin-bottom: 5px;
+      }
+
+      .info-value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #ecf0f1;
+      }
+
+      .scores-section {
+        background: #ecf0f1;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .scores-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+
+      .score-column {
+        text-align: center;
+      }
+
+      .score-column h4 {
+        color: #34495e;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+      }
+
+      .score-list {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .score-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #ecf0f1;
+      }
+
+      .score-item:last-child {
+        border-bottom: none;
+      }
+
+      .log-section {
+        background: #2c3e50;
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .log-section h3 {
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .log-content {
+        background: #34495e;
+        padding: 15px;
+        border-radius: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 0.9em;
+      }
+
+      .log-entry {
+        margin-bottom: 5px;
+        padding: 5px;
+        border-radius: 5px;
+      }
+
+      .log-info {
+        background: #3498db;
+      }
+      .log-success {
+        background: #27ae60;
+      }
+      .log-warning {
+        background: #f39c12;
+      }
+      .log-error {
+        background: #e74c3c;
+      }
+
+      .turn-indicator {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #e74c3c;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .turn-indicator.player1 {
+        background: #3498db;
+      }
+      .turn-indicator.player2 {
+        background: #e67e22;
+      }
+
+      @media (max-width: 1200px) {
         .game-section {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+          grid-template-columns: 1fr;
+          gap: 20px;
         }
-
-        .player-hand {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .player-hand h3 {
-            color: #34495e;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 1.3em;
-        }
-
-        .hand-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .card {
-            background: white;
-            border: 2px solid #bdc3c7;
-            border-radius: 10px;
-            padding: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            width: 80px;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            border-color: #3498db;
-        }
-
-        .card.selected {
-            border-color: #e74c3c;
-            background: #fdf2f2;
-            transform: scale(1.05);
-        }
-
-        .card.played {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .game-board {
-            background: #2c3e50;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .board-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .board-cell {
-            aspect-ratio: 1;
-            background: #34495e;
-            border: 2px solid #2c3e50;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            color: white;
-            font-size: 0.9em;
-            min-width: 60px;
-            min-height: 60px;
-        }
-
-        .board-cell:hover {
-            background: #3498db;
-            transform: scale(1.05);
-        }
-
-        .board-cell.available {
-            background: #27ae60;
-            border-color: #2ecc71;
-        }
-
-        .board-cell.occupied {
-            background: #e67e22;
-            border-color: #f39c12;
-        }
-
-        .board-cell.center {
-            background: #e74c3c;
-            border-color: #c0392b;
-        }
-
-        .controls {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .controls h3 {
-            color: #34495e;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .control-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #229954;
-            transform: translateY(-2px);
-        }
-
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background: #e67e22;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-        }
-
-        .game-info {
-            background: #34495e;
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .info-item {
-            text-align: center;
-        }
-
-        .info-label {
-            font-size: 0.9em;
-            color: #bdc3c7;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ecf0f1;
-        }
-
-        .scores-section {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .scores-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .score-column {
-            text-align: center;
-        }
-
-        .score-column h4 {
-            color: #34495e;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .score-list {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .score-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        .score-item:last-child {
-            border-bottom: none;
-        }
-
-        .log-section {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .log-section h3 {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .log-content {
-            background: #34495e;
-            padding: 15px;
-            border-radius: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-
-        .log-entry {
-            margin-bottom: 5px;
-            padding: 5px;
-            border-radius: 5px;
-        }
-
-        .log-info { background: #3498db; }
-        .log-success { background: #27ae60; }
-        .log-warning { background: #f39c12; }
-        .log-error { background: #e74c3c; }
-
-        .turn-indicator {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #e74c3c;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .turn-indicator.player1 { background: #3498db; }
-        .turn-indicator.player2 { background: #e67e22; }
-
-        @media (max-width: 1200px) {
-            .game-section {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="turn-indicator" id="turnIndicator">Player 1's Turn</div>
-    
+
     <div class="container">
-        <h1>🎴 CrossCribbs Game Testing Interface</h1>
-        
-        <div class="game-info">
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">Current Round</div>
-                    <div class="info-value" id="currentRound">1</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Spots Left</div>
-                    <div class="info-value" id="spotsLeft">24</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Row Score</div>
-                    <div class="info-value" id="rowScore">0</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Column Score</div>
-                    <div class="info-value" id="columnScore">0</div>
-                </div>
-            </div>
+      <h1>🎴 CrossCribbs Game Testing Interface</h1>
+
+      <div class="game-info">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Current Round</div>
+            <div class="info-value" id="currentRound">1</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Spots Left</div>
+            <div class="info-value" id="spotsLeft">24</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Row Score</div>
+            <div class="info-value" id="rowScore">0</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Column Score</div>
+            <div class="info-value" id="columnScore">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-section">
+        <div class="player-hand">
+          <h3>👤 Player 1 Hand</h3>
+          <div class="hand-cards" id="player1Hand"></div>
         </div>
 
-        <div class="game-section">
-            <div class="player-hand">
-                <h3>👤 Player 1 Hand</h3>
-                <div class="hand-cards" id="player1Hand"></div>
-            </div>
-
-            <div class="game-board">
-                <div class="board-grid" id="gameBoard"></div>
-            </div>
-
-            <div class="player-hand">
-                <h3>👤 Player 2 Hand</h3>
-                <div class="hand-cards" id="player2Hand"></div>
-            </div>
+        <div class="game-board">
+          <div class="board-grid" id="gameBoard"></div>
         </div>
 
-        <div class="controls">
-            <h3>🎮 Game Controls</h3>
-            <div class="control-buttons">
-                <button class="btn btn-primary" onclick="resetGame()">🔄 Reset Game</button>
-                <button class="btn btn-success" onclick="nextRound()">⏭️ Next Round</button>
-                <button class="btn btn-warning" onclick="showScores()">📊 Show Scores</button>
-                <button class="btn btn-danger" onclick="clearLog()">🗑️ Clear Log</button>
-            </div>
+        <div class="player-hand">
+          <h3>👤 Player 2 Hand</h3>
+          <div class="hand-cards" id="player2Hand"></div>
         </div>
+      </div>
 
-        <div class="scores-section" id="scoresSection" style="display: none;">
-            <h3>📊 Round Scores</h3>
-            <div class="scores-grid">
-                <div class="score-column">
-                    <h4>Row Scores</h4>
-                    <div class="score-list" id="rowScores"></div>
-                </div>
-                <div class="score-column">
-                    <h4>Column Scores</h4>
-                    <div class="score-list" id="columnScores"></div>
-                </div>
-            </div>
+      <div class="controls">
+        <h3>🎮 Game Controls</h3>
+        <div class="control-buttons">
+          <button class="btn btn-primary" onclick="resetGame()">🔄 Reset Game</button>
+          <button class="btn btn-success" onclick="nextRound()">⏭️ Next Round</button>
+          <button class="btn btn-warning" onclick="showScores()">📊 Show Scores</button>
+          <button class="btn btn-danger" onclick="clearLog()">🗑️ Clear Log</button>
         </div>
+      </div>
 
-        <div class="log-section">
-            <h3>📝 Game Log</h3>
-            <div class="log-content" id="gameLog"></div>
+      <div class="scores-section" id="scoresSection" style="display: none">
+        <h3>📊 Round Scores</h3>
+        <div class="scores-grid">
+          <div class="score-column">
+            <h4>Row Scores</h4>
+            <div class="score-list" id="rowScores"></div>
+          </div>
+          <div class="score-column">
+            <h4>Column Scores</h4>
+            <div class="score-list" id="columnScores"></div>
+          </div>
         </div>
+      </div>
+
+      <div class="log-section">
+        <h3>📝 Game Log</h3>
+        <div class="log-content" id="gameLog"></div>
+      </div>
     </div>
 
     <script type="module">
-        // Import the actual game controller classes
-        import GameController from './gameController.js';
-        
-    let gameController;
-    
-        // Initialize the game interface
-        async function initializeGame() {
-            try {
-                const response = await fetch('/api/game/state');
-                if (response.ok) {
-                    const gameState = await response.json();
-                    updateInterface(gameState);
-                    // Make sure we still create the controller
-                    createActualGame();
-                } else {
-                    createActualGame();
-                }
-            } catch (error) {
-                console.log('Using actual game controller for testing');
-                createActualGame();
-            }
+      // Import the actual game controller classes
+      import GameController from "./gameController.js";
+
+      let gameController;
+
+      // Initialize the game interface
+      async function initializeGame() {
+        try {
+          const response = await fetch("/api/game/state");
+          if (response.ok) {
+            const gameState = await response.json();
+            updateInterface(gameState);
+            // Make sure we still create the controller
+            createActualGame();
+          } else {
+            createActualGame();
+          }
+        } catch (error) {
+          console.log("Using actual game controller for testing");
+          createActualGame();
         }
-    
-        function updateInterface(gameState) {
-            if (gameState) {
-                log('Received game state from server', 'info');
-            }
+      }
+
+      function updateInterface(gameState) {
+        if (gameState) {
+          log("Received game state from server", "info");
         }
-    
-        function createActualGame() {
-            // Create an actual game controller instance
-            gameController = new GameController(2);
-    
-            // Update the interface to reflect the actual game state
-            renderBoard();
-            renderHands();
-            updateGameInfo();
-            updateTurnIndicator();
-            printBoardGrid();
-        }
-    
-        // ------------------------
-        // Rendering Functions
-        // ------------------------
-        function renderBoard() {
-            const board = document.getElementById('gameBoard');
-            board.innerHTML = '';
-            
-            for (let row = 0; row < 5; row++) {
-                for (let col = 0; col < 5; col++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'board-cell';
-                    
-                    if (row === 2 && col === 2) {
-                        cell.className += ' center';
-                        if (gameController.board[row][col]) {
-                            const card = gameController.board[row][col];
-                            const img = document.createElement('img');
-                            img.src = card.frontImgSrc;
-                            img.alt = `${card.name} of ${card.suit}`;
-                            img.style.width = '100%';
-                            img.style.height = '100%';
-                            img.style.objectFit = 'contain';
-                            cell.appendChild(img);
-                        } else {
-                            cell.textContent = '★';
-                        }
-                    } else if (gameController.board[row][col]) {
-                        cell.className += ' occupied';
-                        const card = gameController.board[row][col];
-                        const img = document.createElement('img');
-                        img.src = card.frontImgSrc;
-                        img.alt = `${card.name} of ${card.suit}`;
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'contain';
-                        cell.appendChild(img);
-                    } else {
-                        cell.className += ' available';
-                        cell.textContent = '•';
-                        cell.onclick = () => playCard(row, col);
-                    }
-                    
-                    board.appendChild(cell);
-                }
-            }
-        }
-    
-        function renderHands() {
-            renderHand('player1Hand', gameController.hand1, 1);
-            renderHand('player2Hand', gameController.hand2, 2);
-        }
+      }
 
-        function renderHand(handId, cards, playerNum) {
-            const handElement = document.getElementById(handId);
-            handElement.innerHTML = '';
+      function createActualGame() {
+        // Create an actual game controller instance
+        gameController = new GameController(2);
 
-            // If no cards, show placeholder
-            if (!cards || cards.length === 0) {
-                const emptyEl = document.createElement('div');
-                emptyEl.className = 'card played';
-                emptyEl.textContent = 'Empty';
-                handElement.appendChild(emptyEl);
-                return;
-            }
+        // Update the interface to reflect the actual game state
+        renderBoard();
+        renderHands();
+        updateGameInfo();
+        updateTurnIndicator();
+        printBoardGrid();
+      }
 
-            // Render only the top card (assumed to be the last element)
-            const topCard = cards[cards.length - 1];
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-            cardElement.style.position = 'relative'; // for stack badge
+      // ------------------------
+      // Rendering Functions
+      // ------------------------
+      function renderBoard() {
+        const board = document.getElementById("gameBoard");
+        board.innerHTML = "";
 
-            const img = document.createElement('img');
-            img.src = topCard.frontImgSrc;
-            img.alt = `${topCard.name} of ${topCard.suit}`;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'contain';
-            cardElement.appendChild(img);
+        for (let row = 0; row < 5; row++) {
+          for (let col = 0; col < 5; col++) {
+            const cell = document.createElement("div");
+            cell.className = "board-cell";
 
-            // No click handler on hand cards — playing is done by clicking board cells
-            if (gameController.turn !== playerNum) {
-                cardElement.classList.add('played');
-            }
-
-            // If there are more cards underneath, show a small counter badge
-            if (cards.length > 1) {
-                const badge = document.createElement('div');
-                badge.style.position = 'absolute';
-                badge.style.top = '6px';
-                badge.style.right = '6px';
-                badge.style.background = 'rgba(0,0,0,0.65)';
-                badge.style.color = 'white';
-                badge.style.padding = '2px 6px';
-                badge.style.borderRadius = '999px';
-                badge.style.fontSize = '0.75em';
-                badge.textContent = `${cards.length}`;
-                cardElement.appendChild(badge);
-            }
-
-            handElement.appendChild(cardElement);
-        }
-
-        // ------------------------
-        // Game Logic
-        // ------------------------
-        function playCard(row, col) {
-            const currentPlayer = gameController.turn;
-            const hand = currentPlayer === 1 ? gameController.hand1 : gameController.hand2;
-            if (!hand || hand.length === 0) {
-                log('No cards available to play!', 'warning');
-                return;
-            }
-
-            // Auto-select top card for current player (controller may not need explicit select)
-            const topCard = hand[hand.length - 1];
-            if (typeof gameController.selectCard === 'function') {
-                try {
-                    gameController.selectCard(currentPlayer, topCard);
-                } catch (e) {
-                    // ignore if controller doesn't need explicit select
-                }
-            }
-
-            if (gameController.board[row][col] !== null) {
-                log('Invalid move: Position already occupied', 'error');
-                return;
-            }
-
-            const success = gameController.playCard([row, col]);
-
-            if (success) {
-                renderBoard();
-                renderHands();
-                updateGameInfo();
-                updateTurnIndicator();
-
-                log(`Card played at [${row}, ${col}]`, 'success');
-                printBoardGrid();
-
-                if (gameController.roundOver) {
-                    endRound();
-                }
+            if (row === 2 && col === 2) {
+              cell.className += " center";
+              if (gameController.board[row][col]) {
+                const card = gameController.board[row][col];
+                const img = document.createElement("img");
+                img.src = card.frontImgSrc;
+                img.alt = `${card.name} of ${card.suit}`;
+                img.style.width = "100%";
+                img.style.height = "100%";
+                img.style.objectFit = "contain";
+                cell.appendChild(img);
+              } else {
+                cell.textContent = "★";
+              }
+            } else if (gameController.board[row][col]) {
+              cell.className += " occupied";
+              const card = gameController.board[row][col];
+              const img = document.createElement("img");
+              img.src = card.frontImgSrc;
+              img.alt = `${card.name} of ${card.suit}`;
+              img.style.width = "100%";
+              img.style.height = "100%";
+              img.style.objectFit = "contain";
+              cell.appendChild(img);
             } else {
-                log('Failed to play card', 'error');
+              cell.className += " available";
+              cell.textContent = "•";
+              cell.onclick = () => playCard(row, col);
             }
+
+            board.appendChild(cell);
+          }
         }
-    
-        function endRound() {
-            log('Round ended! Calculating scores...', 'info');
-            
-            updateGameInfo();
-            
-            if (gameController.roundScores && gameController.roundScores.length > 0) {
-                const rowScore = gameController.roundScores[0].total();
-                const colScore = gameController.roundScores[1].total();
-                log(`Round scores - Row: ${rowScore}, Column: ${colScore}`, 'success');
-                
-                if (gameController.gameOver) {
-                    log(`Game Over! ${gameController.winner} wins with ${Math.max(...gameController.totalScores)} points!`, 'success');
-                }
-            }
+      }
+
+      function renderHands() {
+        renderHand("player1Hand", gameController.hand1, 1);
+        renderHand("player2Hand", gameController.hand2, 2);
+      }
+
+      function renderHand(handId, cards, playerNum) {
+        const handElement = document.getElementById(handId);
+        handElement.innerHTML = "";
+
+        // If no cards, show placeholder
+        if (!cards || cards.length === 0) {
+          const emptyEl = document.createElement("div");
+          emptyEl.className = "card played";
+          emptyEl.textContent = "Empty";
+          handElement.appendChild(emptyEl);
+          return;
         }
-    
-        // ------------------------
-        // Utility Functions
-        // ------------------------
-        function resetGame() {
-            gameController.resetGame();
-            renderBoard();
-            renderHands();
-            updateGameInfo();
-            updateTurnIndicator();
-            log('Game reset!', 'info');
-            printBoardGrid();
+
+        // Render only the top card (assumed to be the last element)
+        const topCard = cards[cards.length - 1];
+        const cardElement = document.createElement("div");
+        cardElement.className = "card";
+        cardElement.style.position = "relative"; // for stack badge
+
+        const img = document.createElement("img");
+        img.src = topCard.frontImgSrc;
+        img.alt = `${topCard.name} of ${topCard.suit}`;
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "contain";
+        cardElement.appendChild(img);
+
+        // No click handler on hand cards — playing is done by clicking board cells
+        if (gameController.turn !== playerNum) {
+          cardElement.classList.add("played");
         }
-    
-        function nextRound() {
-            if (!gameController.roundOver) {
-                log('Current round is not finished yet!', 'warning');
-                return;
-            }
-            
-            const success = gameController.nextRound();
-            
-            if (success) {
-                renderBoard();
-                renderHands();
-                updateGameInfo();
-                updateTurnIndicator();
-                log(`Starting round ${gameController.currentRound}`, 'success');
-                printBoardGrid();
+
+        // If there are more cards underneath, show a small counter badge
+        if (cards.length > 1) {
+          const badge = document.createElement("div");
+          badge.style.position = "absolute";
+          badge.style.top = "6px";
+          badge.style.right = "6px";
+          badge.style.background = "rgba(0,0,0,0.65)";
+          badge.style.color = "white";
+          badge.style.padding = "2px 6px";
+          badge.style.borderRadius = "999px";
+          badge.style.fontSize = "0.75em";
+          badge.textContent = `${cards.length}`;
+          cardElement.appendChild(badge);
+        }
+
+        handElement.appendChild(cardElement);
+      }
+
+      // ------------------------
+      // Game Logic
+      // ------------------------
+      function playCard(row, col) {
+        const currentPlayer = gameController.turn;
+        const hand = currentPlayer === 1 ? gameController.hand1 : gameController.hand2;
+        if (!hand || hand.length === 0) {
+          log("No cards available to play!", "warning");
+          return;
+        }
+
+        // Auto-select top card for current player (controller may not need explicit select)
+        const topCard = hand[hand.length - 1];
+        if (typeof gameController.selectCard === "function") {
+          try {
+            gameController.selectCard(currentPlayer, topCard);
+          } catch (e) {
+            // ignore if controller doesn't need explicit select
+          }
+        }
+
+        if (gameController.board[row][col] !== null) {
+          log("Invalid move: Position already occupied", "error");
+          return;
+        }
+
+        const success = gameController.playCard([row, col]);
+
+        if (success) {
+          renderBoard();
+          renderHands();
+          updateGameInfo();
+          updateTurnIndicator();
+
+          log(`Card played at [${row}, ${col}]`, "success");
+          printBoardGrid();
+
+          if (gameController.roundOver) {
+            endRound();
+          }
+        } else {
+          log("Failed to play card", "error");
+        }
+      }
+
+      function endRound() {
+        log("Round ended! Calculating scores...", "info");
+
+        updateGameInfo();
+
+        if (gameController.roundScores && gameController.roundScores.length > 0) {
+          const rowScore = gameController.roundScores[0].total();
+          const colScore = gameController.roundScores[1].total();
+          log(`Round scores - Row: ${rowScore}, Column: ${colScore}`, "success");
+
+          if (gameController.gameOver) {
+            log(
+              `Game Over! ${gameController.winner} wins with ${Math.max(...gameController.totalScores)} points!`,
+              "success"
+            );
+          }
+        }
+      }
+
+      // ------------------------
+      // Utility Functions
+      // ------------------------
+      function resetGame() {
+        gameController.resetGame();
+        renderBoard();
+        renderHands();
+        updateGameInfo();
+        updateTurnIndicator();
+        log("Game reset!", "info");
+        printBoardGrid();
+      }
+
+      function nextRound() {
+        if (!gameController.roundOver) {
+          log("Current round is not finished yet!", "warning");
+          return;
+        }
+
+        const success = gameController.nextRound();
+
+        if (success) {
+          renderBoard();
+          renderHands();
+          updateGameInfo();
+          updateTurnIndicator();
+          log(`Starting round ${gameController.currentRound}`, "success");
+          printBoardGrid();
+        } else {
+          log("Cannot start next round - game is over!", "warning");
+        }
+      }
+
+      function showScores() {
+        const scoresSection = document.getElementById("scoresSection");
+        scoresSection.style.display = scoresSection.style.display === "none" ? "block" : "none";
+
+        if (scoresSection.style.display === "block") {
+          renderScores();
+        }
+      }
+
+      function renderScores() {
+        const rowScores = document.getElementById("rowScores");
+        rowScores.innerHTML = "";
+
+        if (gameController.roundScores && gameController.roundScores.length > 0) {
+          const rowScore = gameController.roundScores[0].total();
+          const scoreItem = document.createElement("div");
+          scoreItem.className = "score-item";
+          scoreItem.innerHTML = `<span>Round ${gameController.currentRound}</span><span>${rowScore}</span>`;
+          rowScores.appendChild(scoreItem);
+        }
+
+        const columnScores = document.getElementById("columnScores");
+        columnScores.innerHTML = "";
+
+        if (gameController.roundScores && gameController.roundScores.length > 0) {
+          const colScore = gameController.roundScores[1].total();
+          const scoreItem = document.createElement("div");
+          scoreItem.className = "score-item";
+          scoreItem.innerHTML = `<span>Round ${gameController.currentRound}</span><span>${colScore}</span>`;
+          columnScores.appendChild(scoreItem);
+        }
+      }
+
+      function updateGameInfo() {
+        document.getElementById("currentRound").textContent = gameController.currentRound;
+        document.getElementById("spotsLeft").textContent = gameController.numSpotsLeft;
+        document.getElementById("rowScore").textContent = gameController.totalScores[0];
+        document.getElementById("columnScore").textContent = gameController.totalScores[1];
+      }
+
+      function updateTurnIndicator() {
+        const indicator = document.getElementById("turnIndicator");
+        indicator.textContent = `Player ${gameController.turn}'s Turn`;
+        indicator.className = `turn-indicator player${gameController.turn}`;
+      }
+
+      function log(message, type = "info") {
+        const logElement = document.getElementById("gameLog");
+        const logEntry = document.createElement("div");
+        logEntry.className = `log-entry log-${type}`;
+        logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logElement.appendChild(logEntry);
+        logElement.scrollTop = logElement.scrollHeight;
+      }
+
+      function clearLog() {
+        document.getElementById("gameLog").innerHTML = "";
+      }
+
+      function printBoardGrid() {
+        log("=== BOARD GRID AFTER TURN ===", "info");
+        let gridString = "";
+
+        for (let row = 0; row < 5; row++) {
+          let rowString = "";
+          for (let col = 0; col < 5; col++) {
+            const cell = gameController.board[row][col];
+            if (cell === null) {
+              rowString += "[ ]";
             } else {
-                log('Cannot start next round - game is over!', 'warning');
+              rowString += `[${cell.name}${cell.suit.charAt(0).toUpperCase()}]`;
             }
+            rowString += " ";
+          }
+          log(rowString.trim(), "info");
         }
-    
-        function showScores() {
-            const scoresSection = document.getElementById('scoresSection');
-            scoresSection.style.display = scoresSection.style.display === 'none' ? 'block' : 'none';
-            
-            if (scoresSection.style.display === 'block') {
-                renderScores();
-            }
-        }
-    
-        function renderScores() {
-            const rowScores = document.getElementById('rowScores');
-            rowScores.innerHTML = '';
-            
-            if (gameController.roundScores && gameController.roundScores.length > 0) {
-                const rowScore = gameController.roundScores[0].total();
-                const scoreItem = document.createElement('div');
-                scoreItem.className = 'score-item';
-                scoreItem.innerHTML = `<span>Round ${gameController.currentRound}</span><span>${rowScore}</span>`;
-                rowScores.appendChild(scoreItem);
-            }
-            
-            const columnScores = document.getElementById('columnScores');
-            columnScores.innerHTML = '';
-            
-            if (gameController.roundScores && gameController.roundScores.length > 0) {
-                const colScore = gameController.roundScores[1].total();
-                const scoreItem = document.createElement('div');
-                scoreItem.className = 'score-item';
-                scoreItem.innerHTML = `<span>Round ${gameController.currentRound}</span><span>${colScore}</span>`;
-                columnScores.appendChild(scoreItem);
-            }
-        }
-    
-        function updateGameInfo() {
-            document.getElementById('currentRound').textContent = gameController.currentRound;
-            document.getElementById('spotsLeft').textContent = gameController.numSpotsLeft;
-            document.getElementById('rowScore').textContent = gameController.totalScores[0];
-            document.getElementById('columnScore').textContent = gameController.totalScores[1];
-        }
-    
-        function updateTurnIndicator() {
-            const indicator = document.getElementById('turnIndicator');
-            indicator.textContent = `Player ${gameController.turn}'s Turn`;
-            indicator.className = `turn-indicator player${gameController.turn}`;
-        }
-    
-        function log(message, type = 'info') {
-            const logElement = document.getElementById('gameLog');
-            const logEntry = document.createElement('div');
-            logEntry.className = `log-entry log-${type}`;
-            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-            logElement.appendChild(logEntry);
-            logElement.scrollTop = logElement.scrollHeight;
-        }
-    
-        function clearLog() {
-            document.getElementById('gameLog').innerHTML = '';
-        }
-    
-        function printBoardGrid() {
-            log('=== BOARD GRID AFTER TURN ===', 'info');
-            let gridString = '';
-            
-            for (let row = 0; row < 5; row++) {
-                let rowString = '';
-                for (let col = 0; col < 5; col++) {
-                    const cell = gameController.board[row][col];
-                    if (cell === null) {
-                        rowString += '[ ]';
-                    } else {
-                        rowString += `[${cell.name}${cell.suit.charAt(0).toUpperCase()}]`;
-                    }
-                    rowString += ' ';
-                }
-                log(rowString.trim(), 'info');
-            }
-            log('=============================', 'info');
-        }
-    
-        // Initialize the game when the page loads
-        window.addEventListener('load', initializeGame);
-        
-        // Make functions globally available
-        window.resetGame = resetGame;
-        window.nextRound = nextRound;
-        window.showScores = showScores;
-        window.clearLog = clearLog;
+        log("=============================", "info");
+      }
+
+      // Initialize the game when the page loads
+      window.addEventListener("load", initializeGame);
+
+      // Make functions globally available
+      window.resetGame = resetGame;
+      window.nextRound = nextRound;
+      window.showScores = showScores;
+      window.clearLog = clearLog;
     </script>
-    
-</body>
+  </body>
 </html>

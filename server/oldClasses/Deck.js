@@ -5,7 +5,7 @@
   - Dealing cards to players
 */
 
-import Card from "./Card.js";
+import Card from "../../server/classes/Card.js";
 export default class Deck {
   deck = [];
   constructor() {

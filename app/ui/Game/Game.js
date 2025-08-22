@@ -1,5 +1,5 @@
-import Board from "~/ui/Game/Board";
-import Player from "~/ui/Game/Player.js";
+import Board from "./Board";
+import Player from "./Player";
 import useCribbs from "../hooks/useCribbs";
 import RoundScore from "./RoundScore";
 import GameOver from "./GameOver";
