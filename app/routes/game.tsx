@@ -5,20 +5,24 @@ import GameOver from "~/ui/Game/GameOver";
 import TurnIndicator from "~/ui/Game/TurnIndicator";
 import RoundHistory from "~/ui/Game/RoundHistory";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import type { GameStateType } from "@shared/types/GameControllerTypes";
 import type { BoardPosition } from "@shared/types/BoardTypes";
 import { socket } from "../connections/socket";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Game() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { gameType, numPlayers, playerNames } = location.state || {};
   const [gameState, setGameState] = useState<GameStateType | null>(null);
   const [player1Name, setPlayer1Name] = useState<string>("Player 1");
   const [player2Name, setPlayer2Name] = useState<string>("Player 2");
 
   useEffect(() => {
+    console.log("location.state: ", location.state);
     // Listener functions
     const handleConnect = () => {
-      console.log("Connected to server");
+      console.log("Game Started");
       socket.emit("startGame");
     };
 
@@ -52,8 +56,9 @@ export default function Game() {
   };
 
   const handleBackToMenu = () => {
-    // resetGame();
     // onGameOver();
+    socket.emit("resetGame");
+    navigate("/");
   };
 
   const playCard = (pos: BoardPosition) => {
