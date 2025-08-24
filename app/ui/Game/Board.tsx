@@ -4,13 +4,16 @@
   - Each spot can accept a card
 */
 
-type ChildProps = {
-  board: number[][];
-  selectedCard: string;
-  playCard: string;
-};
-
 import Spot from "./Spot";
+import type { CardType } from "@shared/types/CardType";
+import type { BoardPosition } from "@shared/types/BoardTypes";
+import type { BoardType } from "@shared/types/GameControllerTypes";
+
+type ChildProps = {
+  board: BoardType;
+  selectedCard: CardType | null;
+  playCard: (pos: BoardPosition) => void;
+};
 
 export default function Board({ board, selectedCard, playCard }: ChildProps) {
   let displayBoard = [];
@@ -19,9 +22,7 @@ export default function Board({ board, selectedCard, playCard }: ChildProps) {
     let row = [];
     for (let c = 0; c < 5; c++) {
       // Pushing spot into row
-      row.push(
-        <Spot pos={[r, c]} card={board[r][c]} key={`${r}, ${c}`} selectedCard={selectedCard} playCard={playCard} />
-      );
+      row.push(<Spot pos={[r, c]} card={board[r][c]} key={`${r}, ${c}`} playCard={playCard} />);
     }
 
     // Pushing row of spots into board

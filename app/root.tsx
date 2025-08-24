@@ -1,12 +1,7 @@
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import "./app.css";
+import { socket } from "./connections/socket";
 
 export const links = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

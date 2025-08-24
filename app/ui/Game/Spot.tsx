@@ -1,5 +1,3 @@
-import CardType from "@shared/types/CardType";
-
 /*
 - Spot component:
   - Handles drag and drop functionality
@@ -7,10 +5,13 @@ import CardType from "@shared/types/CardType";
   - Manages card placement logic
 */
 
+import type { BoardPosition } from "@shared/types/BoardTypes";
+import type { CardType } from "@shared/types/CardType";
+
 type ChildProps = {
-  pos: number[];
-  card: CardType;
-  playCard: CardType;
+  pos: BoardPosition;
+  card: CardType | null;
+  playCard: (pos: BoardPosition) => void;
 };
 
 export default function Spot({ pos, card, playCard }: ChildProps) {
@@ -30,7 +31,7 @@ export default function Spot({ pos, card, playCard }: ChildProps) {
   if (card) {
     return (
       <td className={cardSpotStyles} onDragStart={(e) => (e.dataTransfer.effectAllowed = "move")}>
-        <img className="h-100" src={card.frontImgSrc} alt="" draggable="false" />
+        <img className="h-full" src={card.frontImgSrc} alt="" draggable="false" />
       </td>
     );
   }

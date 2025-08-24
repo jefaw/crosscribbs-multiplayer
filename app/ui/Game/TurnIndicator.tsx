@@ -1,4 +1,10 @@
-export default function TurnIndicator({ turn, player1Name, player2Name }) {
+type ChildProps = {
+  turn: any;
+  player1Name: any;
+  player2Name: any;
+};
+
+export default function TurnIndicator({ turn, player1Name, player2Name }: ChildProps) {
   return (
     <div className="fixed bottom-4 left-4 bg-slate-600 text-white p-3 rounded-lg shadow-lg">
       <div className="flex items-center space-x-2">

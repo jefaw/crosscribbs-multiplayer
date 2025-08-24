@@ -1,37 +1,67 @@
 import Board from "~/ui/Game/Board";
 import Player from "~/ui/Game/Player.js";
-import useCribbs from "../hooks/useCribbs";
-import RoundScore from "./RoundScore";
-import GameOver from "./GameOver";
-import TurnIndicator from "./TurnIndicator";
-import RoundHistory from "./RoundHistory";
+import RoundScore from "~/ui/Game/RoundScore";
+import GameOver from "~/ui/Game/GameOver";
+import TurnIndicator from "~/ui/Game/TurnIndicator";
+import RoundHistory from "~/ui/Game/RoundHistory";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+import type { GameStateType } from "@shared/types/GameControllerTypes";
+import type { BoardPosition } from "@shared/types/BoardTypes";
+import { socket } from "../connections/socket";
 
-export default function Game({ player1Name, player2Name, onGameOver }) {
-  // const {
-  //   board,
-  //   turn,
-  //   hand1,
-  //   hand2,
-  //   selectedCard,
-  //   roundScoreVisible,
-  //   playCard,
-  //   nextRound,
-  //   roundScores,
-  //   totalScores,
-  //   gameOver,
-  //   winner,
-  //   resetGame,
-  //   roundHistory,
-  //   currentRound,
-  // } = useCribbs();
+export default function Game() {
+  const [gameState, setGameState] = useState<GameStateType | null>(null);
+  const [player1Name, setPlayer1Name] = useState<string>("Player 1");
+  const [player2Name, setPlayer2Name] = useState<string>("Player 2");
+
+  useEffect(() => {
+    // Listener functions
+    const handleConnect = () => {
+      console.log("Connected to server");
+      socket.emit("startGame");
+    };
+
+    // if the socket is already connected, call it manually
+    if (socket.connected) {
+      handleConnect();
+    }
+
+    const handleGameUpdate = (state: GameStateType) => {
+      console.log("Game state updated", state);
+      setGameState(state);
+    };
+
+    // Attach listeners
+    socket.on("connect", handleConnect);
+    socket.on("gameStateUpdate", handleGameUpdate);
+
+    // Cleanup on unmount
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("gameStateUpdate", handleGameUpdate);
+    };
+  }, []);
+
+  if (!gameState) {
+    return <div>Loading game...</div>;
+  }
 
   const handleResetGame = () => {
-    resetGame();
+    // resetGame();
   };
 
   const handleBackToMenu = () => {
-    resetGame();
-    onGameOver();
+    // resetGame();
+    // onGameOver();
+  };
+
+  const playCard = (pos: BoardPosition) => {
+    socket.emit("playCard", pos);
+  };
+
+  const nextRound = () => {
+    socket.emit("nextRound");
   };
 
   return (
@@ -41,11 +71,11 @@ export default function Game({ player1Name, player2Name, onGameOver }) {
       Board
       Player 2
      */
-    <>
+    <div className="bg-green-600">
       <div className="flex flex-col xl:flex-row relative">
-        <div className="w-100 xl:w-1/4">
+        <div className="w-full xl:w-1/4">
           <div className="flex justify-start mb-4 pt-2">
-            {!gameOver && (
+            {!gameState.gameOver && (
               <button
                 onClick={handleBackToMenu}
                 className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-colors duration-200"
@@ -54,29 +84,31 @@ export default function Game({ player1Name, player2Name, onGameOver }) {
               </button>
             )}
           </div>
-          <Player name={player1Name} num={1} hand={hand1} turn={turn} />
+          <Player name={"Player 1"} num={1} hand={gameState.hand1} turn={gameState.turn} />
         </div>
-        <div className="w-100 xl:w-1/2">
-          <Board board={board} selectedCard={selectedCard} playCard={playCard} />
+        <div className="w-full xl:w-1/2">
+          <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
         </div>
-        <div className="w-100 xl:w-1/4">
-          <Player name={player2Name} num={2} hand={hand2} turn={turn} />
+        <div className="w-full xl:w-1/4">
+          <Player name={"Player 2"} num={2} hand={gameState.hand2} turn={gameState.turn} />
         </div>
-        {roundScoreVisible && !gameOver && (
-          <RoundScore nextRound={nextRound} roundScores={roundScores} totalScores={totalScores} />
+        {gameState.roundScoreVisible && !gameState.gameOver && (
+          <RoundScore nextRound={nextRound} roundScores={gameState.roundScores} totalScores={gameState.totalScores} />
         )}
-        {gameOver && (
+        {gameState.gameOver && (
           <GameOver
-            winner={winner}
-            totalScores={totalScores}
+            winner={gameState.winner}
+            totalScores={gameState.totalScores}
             resetGame={handleResetGame}
-            roundHistory={roundHistory}
+            roundHistory={gameState.roundHistory}
             onBackToMenu={handleBackToMenu}
           />
         )}
-        {!gameOver && <TurnIndicator turn={turn} player1Name={player1Name} player2Name={player2Name} />}
-        <RoundHistory roundHistory={roundHistory} />
+        {!gameState.gameOver && (
+          <TurnIndicator turn={gameState.turn} player1Name={player1Name} player2Name={player2Name} />
+        )}
+        <RoundHistory roundHistory={gameState.roundHistory} />
       </div>
-    </>
+    </div>
   );
 }

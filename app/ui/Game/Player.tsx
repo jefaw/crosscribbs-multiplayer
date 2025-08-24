@@ -5,15 +5,23 @@
 - Handles card selection and drag events
 */
 
-export default function Player(props) {
+import type { CardType } from "@shared/types/CardType";
+
+type ChildProps = {
+  name: String;
+  num: number;
+  hand: CardType[];
+  turn: number;
+};
+
+export default function Player({ name, num, hand, turn }: ChildProps) {
   // hand = props.hand
-  const { name, num, hand, turn } = props;
 
   //Get top card
   const card = hand.length > 0 ? hand[hand.length - 1] : false;
   const backImgSrc = `cards/backs/red2.svg`; // can be changed in future
 
-  function handleDragStart(e) {
+  function handleDragStart(e: any) {
     e.dataTransfer.effectAllowed = "move"; // don't show plus icon on drag
   }
 
@@ -24,23 +32,24 @@ export default function Player(props) {
     num === 1 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-slate-100 to-slate-200";
 
   // Only show card if it's the player's turn
-  const displayCard = isActive ? (
-    <div className="flex flex-col items-center space-y-2">
-      <img
-        className="w-36 h-auto self-center hover:border-gray-700 border-transparent border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105"
-        src={card.frontImgSrc}
-        alt=""
-        draggable={true}
-        onDragStart={handleDragStart}
-      />
-      <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
-    </div>
-  ) : (
-    <div className="flex flex-col items-center space-y-2">
-      <img className="w-36 h-auto self-center rounded-lg shadow-lg" src={backImgSrc} alt="" draggable={false} />
-      <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
-    </div>
-  );
+  const displayCard =
+    isActive && card ? (
+      <div className="flex flex-col items-center space-y-2">
+        <img
+          className="w-36 h-auto self-center hover:border-gray-700 border-transparent border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105"
+          src={card.frontImgSrc}
+          alt=""
+          draggable={true}
+          onDragStart={handleDragStart}
+        />
+        <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
+      </div>
+    ) : (
+      <div className="flex flex-col items-center space-y-2">
+        <img className="w-36 h-auto self-center rounded-lg shadow-lg" src={backImgSrc} alt="" draggable={false} />
+        <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
+      </div>
+    );
 
   return (
     <>

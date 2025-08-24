@@ -6,11 +6,16 @@
   - Total scores
   - Winner and point difference
 */
-export default function RoundScore(props) {
-  const { nextRound, roundScores, totalScores } = props;
 
+type ChildProps = {
+  nextRound: () => void;
+  roundScores: any;
+  totalScores: any;
+};
+
+export default function RoundScore({ nextRound, roundScores, totalScores }: ChildProps) {
   function scoreDiff() {
-    let winner = roundScores[0].total() > roundScores[1].total() ? "Row" : "Column";
+    let winner = roundScores[0].total > roundScores[1].total ? "Row" : "Column";
 
     return winner;
   }
@@ -25,7 +30,7 @@ export default function RoundScore(props) {
         <div className="w-full flex justify-center mb-3 text-center">
           <div>
             <h3 className="font-bold text-3xl text-cyan-400">Row</h3>
-            <p className="text-2xl text-cyan-400">Round Score: {roundScores[0].total()}</p>
+            <p className="text-2xl text-cyan-400">Round Score: {roundScores[0].total}</p>
             <p className="text-1xl">
               {roundScores[0].pairs} (pairs) + {roundScores[0].runs} (runs) + {roundScores[0].fifteens} (fifteens)
             </p>
@@ -35,14 +40,14 @@ export default function RoundScore(props) {
         <div className="w-full flex justify-center mb-3 text-center ">
           <div>
             <h3 className="font-bold text-3xl text-fuchsia-400">Column</h3>
-            <p className="text-2xl text-fuchsia-400">Round Score: {roundScores[1].total()}</p>
+            <p className="text-2xl text-fuchsia-400">Round Score: {roundScores[1].total}</p>
             <p className="text-1xl">
               {roundScores[1].pairs} (pairs) + {roundScores[1].runs} (runs) + {roundScores[1].fifteens} (fifteens)
             </p>
             <p className="text-2xl mb-2">Total Score: {totalScores[1]}</p>
 
             <p className="font-semi-bold text-xl bg-emerald-600 rounded-md mb-1 italic">
-              {scoreDiff()} earns {Math.abs(roundScores[0].total() - roundScores[1].total())} points!
+              {scoreDiff()} earns {Math.abs(roundScores[0].total - roundScores[1].total)} points!
             </p>
           </div>
         </div>

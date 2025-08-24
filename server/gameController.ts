@@ -96,8 +96,8 @@ export default class GameController {
     this.roundScoreVisible = true;
     this.roundScores = tallyScores(this.board);
     const [rowRoundScore, columnRoundScore] = this.roundScores;
-    const rowPoints = rowRoundScore.total();
-    const columnPoints = columnRoundScore.total();
+    const rowPoints = rowRoundScore.total;
+    const columnPoints = columnRoundScore.total;
     const pointDiff = Math.abs(rowPoints - columnPoints);
     const roundWinner: "Row" | "Column" = rowPoints >= columnPoints ? "Row" : "Column";
 

@@ -1,10 +1,16 @@
-export default function RoundHistory({ roundHistory }) {
+import type { RoundHistoryType } from "@shared/types/GameControllerTypes";
+
+type ChildProps = {
+  roundHistory: RoundHistoryType[];
+};
+
+export default function RoundHistory({ roundHistory }: ChildProps) {
   if (roundHistory.length === 0) return null;
 
   // Calculate running totals in chronological order
   let rowTotal = 0;
   let columnTotal = 0;
-  const chronologicalTotals = roundHistory.map(round => {
+  const chronologicalTotals = roundHistory.map((round) => {
     if (round.winner === "Row") {
       rowTotal += round.pointDiff;
     } else {
@@ -42,4 +48,4 @@ export default function RoundHistory({ roundHistory }) {
       </div>
     </div>
   );
-} 
+}
