@@ -6,6 +6,10 @@
     "Noto Color Emoji";
 }
 
+html {
+  font-size: clamp(12px, 1vw + 0.5rem, 16px);
+}
+
 html,
 body {
   @apply bg-white dark:bg-gray-950;

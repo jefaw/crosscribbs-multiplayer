@@ -25,8 +25,8 @@ export default function Spot({ pos, card, playCard }: ChildProps) {
     playCard(pos);
   }
 
-  const cardSpotStyles =
-    "w-[103px] h-36 mx-10 mb-10 bg-stone-200 border-2 border-stone-700 hover:bg-blue-300 transition duration-300 cursor-pointer";
+    const cardSpotStyles =
+    "w-[6.4375rem] h-[9rem] mx-10 mb-10 bg-stone-200 border-2 border-stone-700 hover:bg-blue-300 transition duration-300 cursor-pointer";
 
   if (card) {
     return (

@@ -4,7 +4,7 @@ import RoundScore from "~/ui/Game/RoundScore";
 import GameOver from "~/ui/Game/GameOver";
 import TurnIndicator from "~/ui/Game/TurnIndicator";
 import RoundHistory from "~/ui/Game/RoundHistory";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react"; // Added useRef
 import type { GameStateType } from "@shared/types/GameControllerTypes";
 import type { BoardPosition } from "@shared/types/BoardTypes";
 import { socket } from "../connections/socket";
@@ -15,6 +15,11 @@ export default function Game() {
   const navigate = useNavigate();
   const { gameType, numPlayers, playerNames } = location.state || {};
   const [gameState, setGameState] = useState<GameStateType | null>(null);
+
+  // Added for dynamic scaling
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [transformOrigin, setTransformOrigin] = useState('top left');
 
   useEffect(() => {
     console.log("location.state: ", location.state);
@@ -38,12 +43,52 @@ export default function Game() {
     socket.on("connect", handleConnect);
     socket.on("gameStateUpdate", handleGameUpdate);
 
+    // Dynamic scaling logic
+    const calculateScale = () => {
+      if (gameContainerRef.current) {
+        const gameWidth = gameContainerRef.current.offsetWidth; // Use offsetWidth for the base width
+        const gameHeight = gameContainerRef.current.offsetHeight; // Use offsetHeight for the base height
+
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // Target aspect ratio (width / height)
+        const targetAspectRatio = gameWidth / gameHeight;
+
+        let newScale = 1;
+
+        // Calculate scale based on fitting within the window while maintaining aspect ratio
+        const scaleX = windowWidth / gameWidth;
+        const scaleY = windowHeight / gameHeight;
+
+        // If the window is wider than the target aspect ratio, scale based on height
+        if (windowWidth / windowHeight > targetAspectRatio) {
+          newScale = scaleY;
+        } else { // If the window is taller or has the same aspect ratio, scale based on width
+          newScale = scaleX;
+        }
+
+        // Ensure we don't scale up beyond 1 (original size)
+        newScale = Math.min(newScale, 1);
+
+        setScale(newScale);
+        setTransformOrigin('top left'); // Keep top left for now
+      }
+    };
+
+    // Initial calculation
+    calculateScale();
+
+    // Recalculate on window resize
+    window.addEventListener('resize', calculateScale);
+
     // Cleanup on unmount
     return () => {
       socket.off("connect", handleConnect);
       socket.off("gameStateUpdate", handleGameUpdate);
+      window.removeEventListener('resize', calculateScale); // Cleanup resize listener
     };
-  }, []);
+  }, [location.state, numPlayers]); // Added numPlayers to dependency array
 
   if (!gameState) {
     return <div>Loading game...</div>;
@@ -70,8 +115,12 @@ export default function Game() {
   const hands = [gameState.hand1, gameState.hand2, gameState.hand3, gameState.hand4];
 
   return (
-    <div className="bg-green-600">
-      <div className="flex flex-col xl:flex-row relative">
+    <div className="bg-green-600 w-screen h-screen overflow-hidden">
+      <div
+        ref={gameContainerRef} // Added ref
+        className="flex flex-col xl:flex-row relative min-h-0 flex-grow"
+        style={{ transform: `scale(${scale})`, transformOrigin: transformOrigin }} // Applied dynamic style
+      >
         <div className="w-full xl:w-1/4">
           <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
