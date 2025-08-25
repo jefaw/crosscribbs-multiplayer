@@ -6,15 +6,18 @@
 */
 
 import type { CardType } from "@shared/types/CardType";
+import { socket } from "~/connections/socket";
 
 type ChildProps = {
   name: String;
   num: number;
   hand: CardType[];
   turn: number;
+  crib: CardType[];
+  numPlayers: number;
 };
 
-export default function Player({ name, num, hand, turn }: ChildProps) {
+export default function Player({ name, num, hand, turn, crib, numPlayers }: ChildProps) {
   // hand = props.hand
 
   //Get top card
@@ -23,6 +26,12 @@ export default function Player({ name, num, hand, turn }: ChildProps) {
 
   function handleDragStart(e: any) {
     e.dataTransfer.effectAllowed = "move"; // don't show plus icon on drag
+  }
+
+  function handleDiscard() {
+    if (card) {
+      socket.emit("discardToCrib", { player: turn, card });
+    }
   }
 
   const isActive = num === turn;
@@ -43,6 +52,14 @@ export default function Player({ name, num, hand, turn }: ChildProps) {
           onDragStart={handleDragStart}
         />
         <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
+        {crib.length < 4 && (
+          <button
+            onClick={handleDiscard}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2"
+          >
+            Discard to Crib
+          </button>
+        )}
       </div>
     ) : (
       <div className="flex flex-col items-center space-y-2">

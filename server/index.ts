@@ -89,6 +89,18 @@ io.on("connection", (socket) => {
     io.emit("gameStateUpdate", game.getGameState());
   });
 
+  socket.on("selectDealer", (winningPlayer) => {
+    game.selectDealer(winningPlayer);
+    io.emit("gameStateUpdate", game.getGameState());
+  });
+
+  socket.on("discardToCrib", ({ player, card }) => {
+    const success = game.discardToCrib(player, card);
+    if (success) {
+      io.emit("gameStateUpdate", game.getGameState());
+    }
+  });
+
   // Listen for a test message from the client
   // socket.on("sendMessage", (data) => {
   //   console.log(`Received message from ${socket.id}: ${data}`);

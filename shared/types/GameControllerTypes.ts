@@ -43,6 +43,11 @@ export interface GameStateType {
   roundHistory: RoundHistoryType[];
   currentRound: number;
   numSpotsLeft: number;
+  dealer: number | null;
+  crib: CardType[];
+  dealerSelectionCards: CardType[] | null;
+  dealerSelectionComplete: boolean;
+  cribScore: ScoreType | null;
   // added ai fields maybe should use instead
 
   // players: PlayerType[];

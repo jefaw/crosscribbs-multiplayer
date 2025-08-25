@@ -23,6 +23,11 @@ export default class GameController {
   winner: "Row" | "Column" | null;
   roundHistory: RoundHistoryType[];
   currentRound: number;
+  dealer: number | null;
+  crib: CardType[];
+  dealerSelectionCards: CardType[] | null;
+  dealerSelectionComplete: boolean;
+  cribScore: ScoreType | null;
 
   constructor(numPlayers = 2) {
     this.numPlayers = numPlayers;
@@ -43,22 +48,48 @@ export default class GameController {
     this.winner = null;
     this.roundHistory = [];
     this.currentRound = 1;
+    this.dealer = null;
+    this.crib = [];
+    this.dealerSelectionCards = null;
+    this.dealerSelectionComplete = false;
+    this.cribScore = null;
 
     // Initialize the game
+    this.startDealerSelection();
+  }
+
+  startDealerSelection(): void {
+    this.deck = newDeck();
+    this.dealerSelectionCards = this.deck.slice(0, this.numPlayers);
+  }
+
+  selectDealer(winningPlayer: number): void {
+    this.dealer = winningPlayer;
+    this.dealerSelectionComplete = true;
     this.initializeGame();
   }
 
   initializeGame(): void {
     this.deck = newDeck();
     this.board[2][2] = this.deck[0];
+
+    // His Heels
+    if (this.deck[0].value === "J") {
+      if (this.dealer === 1 || this.dealer === 3) {
+        this.totalScores[0] += 2;
+      } else {
+        this.totalScores[1] += 2;
+      }
+    }
+
     if (this.numPlayers === 2) {
-      this.hand1 = this.deck?.slice(1, 13) || [];
-      this.hand2 = this.deck?.slice(13, 25) || [];
+      this.hand1 = this.deck?.slice(1, 15) || []; // 14 cards
+      this.hand2 = this.deck?.slice(15, 29) || []; // 14 cards
     } else {
-      this.hand1 = this.deck?.slice(1, 7) || [];
-      this.hand2 = this.deck?.slice(7, 13) || [];
-      this.hand3 = this.deck?.slice(13, 19) || [];
-      this.hand4 = this.deck?.slice(19, 25) || [];
+      this.hand1 = this.deck?.slice(1, 8) || []; // 7 cards
+      this.hand2 = this.deck?.slice(8, 15) || []; // 7 cards
+      this.hand3 = this.deck?.slice(15, 22) || []; // 7 cards
+      this.hand4 = this.deck?.slice(22, 29) || []; // 7 cards
     }
     this.selectedCard = this.hand1[this.hand1.length - 1];
   }
@@ -98,6 +129,31 @@ export default class GameController {
     return true;
   }
 
+  discardToCrib(player: number, card: CardType): boolean {
+    if (player !== this.turn) return false;
+
+    this.crib.push(card);
+
+    let hand: CardType[];
+    if (this.turn === 1) hand = this.hand1;
+    else if (this.turn === 2) hand = this.hand2;
+    else if (this.turn === 3) hand = this.hand3;
+    else if (this.turn === 4) hand = this.hand4;
+    else hand = [];
+
+    const cardIndex = hand.findIndex(c => c.suit === card.suit && c.value === card.value);
+    if (cardIndex > -1) {
+      hand.splice(cardIndex, 1);
+    } else {
+      return false; // card not in hand
+    }
+
+    this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
+    this.updateSelectedCard();
+
+    return true;
+  }
+
   updateSelectedCard(): void {
     let hand: CardType[];
     if (this.turn === 1) hand = this.hand1;
@@ -111,7 +167,32 @@ export default class GameController {
 
   handleRoundEnd(): void {
     this.roundScoreVisible = true;
-    this.roundScores = tallyScores(this.board);
+
+    // Score the crib
+    const cutCard = this.board[2][2];
+    if (cutCard) {
+      const cribHand: CardType[] = [...this.crib, cutCard];
+      let cribKnobsScore = 0;
+      for (const card of this.crib) {
+        if (card.value === "J" && card.suit === cutCard.suit) {
+          cribKnobsScore = 1;
+          break;
+        }
+      }
+
+      // There is no helper function to score a single hand, so I will mock a board
+      const cribBoard: BoardType = [cribHand, [], [], [], []];
+      this.cribScore = tallyScores(cribBoard)[0]; // only care about the row score
+      const totalCribScore = this.cribScore.total + cribKnobsScore;
+
+      if (this.dealer === 1 || this.dealer === 3) {
+        this.totalScores[0] += totalCribScore;
+      } else {
+        this.totalScores[1] += totalCribScore;
+      }
+    }
+
+    this.roundScores = tallyScores(this.board, cutCard);
     const [rowRoundScore, columnRoundScore] = this.roundScores;
     const rowPoints = rowRoundScore.total;
     const columnPoints = columnRoundScore.total;
@@ -146,6 +227,10 @@ export default class GameController {
     this.roundOver = false;
     this.deck = newDeck();
     this.currentRound++;
+    this.crib = [];
+    if (this.dealer) {
+      this.dealer = this.dealer >= this.numPlayers ? 1 : this.dealer + 1;
+    }
     this.initializeGame();
     return true;
   }
@@ -182,6 +267,11 @@ export default class GameController {
       roundHistory: this.roundHistory,
       currentRound: this.currentRound,
       numSpotsLeft: this.numSpotsLeft,
+      dealer: this.dealer,
+      crib: this.crib,
+      dealerSelectionCards: this.dealerSelectionCards,
+      dealerSelectionComplete: this.dealerSelectionComplete,
+      cribScore: this.cribScore,
     };
   }
 

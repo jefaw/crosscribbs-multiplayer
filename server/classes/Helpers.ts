@@ -43,25 +43,38 @@ function newDeck() {
 export { newBoard, newDeck, tallyScores };
 
 //Scoring
-function tallyScores(board: BoardType) {
-  const rowScore = calculateScore(board);
-  const colScore = calculateScore(transpose(board));
+function tallyScores(board: BoardType, cutCard?: CardType) {
+  const rowScore = calculateScore(board, cutCard);
+  const colScore = calculateScore(transpose(board), cutCard);
 
   return [rowScore, colScore];
 }
 
 //returns a score object
-function calculateScore(board: BoardType) {
+function calculateScore(board: BoardType, cutCard?: CardType) {
   let score = 0;
   let pairTotal = 0;
   let runTotal = 0;
   let fifteenTotal = 0;
+  let knobsTotal = 0;
   // Assuming grid is a 2D array
-  for (const row of board) {
+  for (const [i, row] of board.entries()) {
     let rowScore = 0;
     let pairScore = 0;
     let runScore = 0;
     let fifteenScore = 0;
+    let knobsScore = 0;
+
+    // His Knobs on the board
+    if (cutCard && i === 2) {
+      for (const card of row) {
+        if (card && card.value === "J" && card.suit === cutCard.suit) {
+          knobsScore = 1;
+          knobsTotal += 1;
+          break;
+        }
+      }
+    }
 
     console.log(row);
 
@@ -114,13 +127,11 @@ function calculateScore(board: BoardType) {
       }
     }
 
-    pairTotal += pairScore;
-    runTotal += runScore;
     fifteenTotal += fifteenScore;
-    rowScore = pairScore + runScore + fifteenScore;
+    rowScore = pairScore + runScore + fifteenScore + knobsScore;
     score += rowScore;
     console.log(
-      `Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) = ${rowScore}`
+      `Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) + (Knobs: ${knobsScore}) = ${rowScore}`
     );
 
     rowScore = 0;
@@ -131,7 +142,7 @@ function calculateScore(board: BoardType) {
     // Can keep total scores for pairs and runs as well
   }
 
-  const scoreTotals = new Score(pairTotal, runTotal, fifteenTotal);
+  const scoreTotals = new Score(pairTotal, runTotal, fifteenTotal, knobsTotal);
   return scoreTotals;
 }
 
