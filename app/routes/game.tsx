@@ -81,7 +81,7 @@ export default function Game() {
             {!gameState.gameOver && (
               <button
                 onClick={handleBackToMenu}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-colors duration-200"
+                className="fixed top-4 left-4 z-10 bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-colors duration-200"
               >
                 Back to Menu
               </button>
