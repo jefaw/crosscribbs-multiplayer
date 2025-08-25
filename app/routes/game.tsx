@@ -77,7 +77,7 @@ export default function Game() {
             {!gameState.gameOver && (
               <button
                 onClick={handleBackToMenu}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-colors duration-200"
+                className="fixed top-4 left-4 z-10 bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-colors duration-200"
               >
                 Back to Menu
               </button>
@@ -89,9 +89,7 @@ export default function Game() {
               <Player name={playerNames[2]} num={3} hand={hands[2]} turn={gameState.turn} />
             </>
           )}
-          {numPlayers === 2 && (
-            <Player name={playerNames[0]} num={1} hand={hands[0]} turn={gameState.turn} />
-          )}
+          {numPlayers === 2 && <Player name={playerNames[0]} num={1} hand={hands[0]} turn={gameState.turn} />}
         </div>
         <div className="w-full xl:w-1/2">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
@@ -103,9 +101,7 @@ export default function Game() {
               <Player name={playerNames[3]} num={4} hand={hands[3]} turn={gameState.turn} />
             </>
           )}
-          {numPlayers === 2 && (
-            <Player name={playerNames[1]} num={2} hand={hands[1]} turn={gameState.turn} />
-          )}
+          {numPlayers === 2 && <Player name={playerNames[1]} num={2} hand={hands[1]} turn={gameState.turn} />}
         </div>
         {gameState.roundScoreVisible && !gameState.gameOver && (
           <RoundScore nextRound={nextRound} roundScores={gameState.roundScores} totalScores={gameState.totalScores} />
@@ -119,9 +115,7 @@ export default function Game() {
             onBackToMenu={handleBackToMenu}
           />
         )}
-        {!gameState.gameOver && (
-          <TurnIndicator turn={gameState.turn} playerNames={playerNames} />
-        )}
+        {!gameState.gameOver && <TurnIndicator turn={gameState.turn} playerNames={playerNames} />}
         <RoundHistory roundHistory={gameState.roundHistory} />
       </div>
     </div>
