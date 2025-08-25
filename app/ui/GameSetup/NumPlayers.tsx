@@ -15,10 +15,9 @@ export default function NumPlayers({ onSelect, onBack }: ChildProps) {
       </button>
       <button
         onClick={() => onSelect(4)}
-        className="w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-lg text-lg opacity-50 cursor-not-allowed"
-        disabled
+        className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
       >
-        2v2 (Coming Soon)
+        2v2
       </button>
       <button
         onClick={() => onBack()}

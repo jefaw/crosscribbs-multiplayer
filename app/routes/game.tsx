@@ -15,15 +15,13 @@ export default function Game() {
   const navigate = useNavigate();
   const { gameType, numPlayers, playerNames } = location.state || {};
   const [gameState, setGameState] = useState<GameStateType | null>(null);
-  const [player1Name, setPlayer1Name] = useState<string>("Player 1");
-  const [player2Name, setPlayer2Name] = useState<string>("Player 2");
 
   useEffect(() => {
     console.log("location.state: ", location.state);
     // Listener functions
     const handleConnect = () => {
       console.log("Game Started");
-      socket.emit("startGame");
+      socket.emit("startGame", { numPlayers });
     };
 
     // if the socket is already connected, call it manually
@@ -69,13 +67,9 @@ export default function Game() {
     socket.emit("nextRound");
   };
 
+  const hands = [gameState.hand1, gameState.hand2, gameState.hand3, gameState.hand4];
+
   return (
-    /*
-    Game Layout: 
-      Player 1
-      Board
-      Player 2
-     */
     <div className="bg-green-600">
       <div className="flex flex-col xl:flex-row relative">
         <div className="w-full xl:w-1/4">
@@ -89,13 +83,29 @@ export default function Game() {
               </button>
             )}
           </div>
-          <Player name={"Player 1"} num={1} hand={gameState.hand1} turn={gameState.turn} />
+          {numPlayers === 4 && (
+            <>
+              <Player name={playerNames[0]} num={1} hand={hands[0]} turn={gameState.turn} />
+              <Player name={playerNames[2]} num={3} hand={hands[2]} turn={gameState.turn} />
+            </>
+          )}
+          {numPlayers === 2 && (
+            <Player name={playerNames[0]} num={1} hand={hands[0]} turn={gameState.turn} />
+          )}
         </div>
         <div className="w-full xl:w-1/2">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
         </div>
         <div className="w-full xl:w-1/4">
-          <Player name={"Player 2"} num={2} hand={gameState.hand2} turn={gameState.turn} />
+          {numPlayers === 4 && (
+            <>
+              <Player name={playerNames[1]} num={2} hand={hands[1]} turn={gameState.turn} />
+              <Player name={playerNames[3]} num={4} hand={hands[3]} turn={gameState.turn} />
+            </>
+          )}
+          {numPlayers === 2 && (
+            <Player name={playerNames[1]} num={2} hand={hands[1]} turn={gameState.turn} />
+          )}
         </div>
         {gameState.roundScoreVisible && !gameState.gameOver && (
           <RoundScore nextRound={nextRound} roundScores={gameState.roundScores} totalScores={gameState.totalScores} />
@@ -110,7 +120,7 @@ export default function Game() {
           />
         )}
         {!gameState.gameOver && (
-          <TurnIndicator turn={gameState.turn} player1Name={player1Name} player2Name={player2Name} />
+          <TurnIndicator turn={gameState.turn} playerNames={playerNames} />
         )}
         <RoundHistory roundHistory={gameState.roundHistory} />
       </div>

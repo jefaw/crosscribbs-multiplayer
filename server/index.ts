@@ -50,12 +50,13 @@ const gameState = {
 };
 
 // create a local 2 player game
-const game = new GameController(2);
+let game: GameController;
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  socket.on("startGame", () => {
+  socket.on("startGame", ({ numPlayers }) => {
+    game = new GameController(numPlayers);
     io.emit("gameStateUpdate", game.getGameState());
     console.log("Game Started");
   });

@@ -26,7 +26,7 @@ export default function Player({ name, num, hand, turn }: ChildProps) {
   }
 
   const isActive = num === turn;
-  const borderColor = num === 1 ? "border-cyan-400" : "border-fuchsia-400";
+  const borderColor = num % 2 === 0 ? "border-cyan-400" : "border-fuchsia-400";
   const borderStyle = isActive ? `border-8 ${borderColor}` : "border-2 border-stone-700";
   const bgGradient =
     num === 1 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-slate-100 to-slate-200";

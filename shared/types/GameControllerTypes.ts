@@ -31,6 +31,9 @@ export interface GameStateType {
   turn: number;
   hand1: CardType[];
   hand2: CardType[];
+  hand3: CardType[];
+  hand4: CardType[];
+  numPlayers: number;
   selectedCard: CardType | null;
   roundScoreVisible: boolean;
   roundScores: ScoreType[] | null; // You can refine if you know exact score types

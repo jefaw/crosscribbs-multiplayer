@@ -12,7 +12,7 @@ export default function GameSetup() {
   const [currentPage, setCurrentPage] = useState<SetupPage>("gameType");
   const [gameType, setGameType] = useState<"local" | "online" | null>(null);
   const [numPlayers, setNumPlayers] = useState<2 | 4>(2);
-  const [playerNames, setPlayerNames] = useState<[String, String]>(["", ""]);
+  const [playerNames, setPlayerNames] = useState<String[]>([]);
 
   const goToNextPage = (next: SetupPage) => setCurrentPage(next);
   const goBack = () => {

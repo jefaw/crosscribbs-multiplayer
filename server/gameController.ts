@@ -10,6 +10,8 @@ export default class GameController {
   board: BoardType;
   hand1: CardType[];
   hand2: CardType[];
+  hand3: CardType[];
+  hand4: CardType[];
   turn: number;
   selectedCard: CardType | null;
   roundScoreVisible: boolean;
@@ -28,6 +30,8 @@ export default class GameController {
     this.board = newBoard();
     this.hand1 = [];
     this.hand2 = [];
+    this.hand3 = [];
+    this.hand4 = [];
     this.turn = 1;
     this.selectedCard = null;
     this.roundScoreVisible = false;
@@ -47,8 +51,15 @@ export default class GameController {
   initializeGame(): void {
     this.deck = newDeck();
     this.board[2][2] = this.deck[0];
-    this.hand1 = this.deck?.slice(1, 13) || [];
-    this.hand2 = this.deck?.slice(13, 25) || [];
+    if (this.numPlayers === 2) {
+      this.hand1 = this.deck?.slice(1, 13) || [];
+      this.hand2 = this.deck?.slice(13, 25) || [];
+    } else {
+      this.hand1 = this.deck?.slice(1, 7) || [];
+      this.hand2 = this.deck?.slice(7, 13) || [];
+      this.hand3 = this.deck?.slice(13, 19) || [];
+      this.hand4 = this.deck?.slice(19, 25) || [];
+    }
     this.selectedCard = this.hand1[this.hand1.length - 1];
   }
 
@@ -67,6 +78,10 @@ export default class GameController {
       this.hand1.pop();
     } else if (this.turn === 2) {
       this.hand2.pop();
+    } else if (this.turn === 3) {
+      this.hand3.pop();
+    } else if (this.turn === 4) {
+      this.hand4.pop();
     }
 
     this.selectedCard = null;
@@ -87,6 +102,8 @@ export default class GameController {
     let hand: CardType[];
     if (this.turn === 1) hand = this.hand1;
     else if (this.turn === 2) hand = this.hand2;
+    else if (this.turn === 3) hand = this.hand3;
+    else if (this.turn === 4) hand = this.hand4;
     else hand = [];
 
     this.selectedCard = hand.length > 0 ? hand[hand.length - 1] : null;
@@ -153,6 +170,9 @@ export default class GameController {
       turn: this.turn,
       hand1: this.hand1,
       hand2: this.hand2,
+      hand3: this.hand3,
+      hand4: this.hand4,
+      numPlayers: this.numPlayers,
       selectedCard: this.selectedCard,
       roundScoreVisible: this.roundScoreVisible,
       roundScores: this.roundScores,
