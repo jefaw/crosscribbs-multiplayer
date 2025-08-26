@@ -94,8 +94,8 @@ io.on("connection", (socket) => {
     io.emit("gameStateUpdate", game.getGameState());
   });
 
-  socket.on("discardToCrib", ({ player, card }) => {
-    const success = game.discardToCrib(player, card);
+  socket.on("discardToCrib", ({ numPlayers, player, card }) => {
+    const success = game.discardToCrib(numPlayers, player, card);
     if (success) {
       io.emit("gameStateUpdate", game.getGameState());
     }

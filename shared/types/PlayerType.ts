@@ -1,8 +1,9 @@
 import type { CardType } from "./CardType";
 
 export interface PlayerType {
-  id: number; // socket id of player
+  id: String; // socket id of player
+  num: number;
   name: String; // player username
   hand: CardType[];
-  score: number;
+  discardedToCrib: CardType[];
 }

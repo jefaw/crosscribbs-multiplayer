@@ -1,13 +1,6 @@
 import type { CardType } from "./CardType";
+import type { PlayerType } from "./PlayerType";
 import type { ScoreType } from "./ScoreType";
-
-// not using currently
-export interface PlayerType {
-  id: string; // unique player id
-  name: string;
-  hand: CardType[]; // cards in hand
-  score: number;
-}
 
 // Optional: define moves/actions
 export interface MoveType {
@@ -29,10 +22,10 @@ export interface RoundHistoryType {
 export interface GameStateType {
   board: BoardType;
   turn: number;
-  hand1: CardType[];
-  hand2: CardType[];
-  hand3: CardType[];
-  hand4: CardType[];
+  player1: PlayerType;
+  player2: PlayerType;
+  player3: PlayerType;
+  player4: PlayerType;
   numPlayers: number;
   selectedCard: CardType | null;
   roundScoreVisible: boolean;

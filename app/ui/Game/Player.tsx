@@ -6,18 +6,19 @@
 */
 
 import type { CardType } from "@shared/types/CardType";
+import type { PlayerType } from "@shared/types/PlayerType";
 import { socket } from "~/connections/socket";
 
 type ChildProps = {
   name: String;
-  num: number;
-  hand: CardType[];
+  player: PlayerType;
   turn: number;
   crib: CardType[];
   numPlayers: number;
 };
 
-export default function Player({ name, num, hand, turn, crib, numPlayers }: ChildProps) {
+export default function Player({ name, player, turn, crib, numPlayers }: ChildProps) {
+  const { hand, discardedToCrib } = player;
   // hand = props.hand
 
   //Get top card
@@ -30,15 +31,19 @@ export default function Player({ name, num, hand, turn, crib, numPlayers }: Chil
 
   function handleDiscard() {
     if (card) {
-      socket.emit("discardToCrib", { player: turn, card });
+      socket.emit("discardToCrib", { numPlayers, player, card });
     }
   }
 
-  const isActive = num === turn;
-  const borderColor = num % 2 === 0 ? "border-cyan-400" : "border-fuchsia-400";
+  const isActive = player.num === turn;
+  const borderColor = player.num % 2 === 0 ? "border-cyan-400" : "border-fuchsia-400";
   const borderStyle = isActive ? `border-8 ${borderColor}` : "border-2 border-stone-700";
   const bgGradient =
-    num === 1 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-slate-100 to-slate-200";
+    player.num === 1
+      ? "bg-gradient-to-br from-slate-100 to-slate-200"
+      : "bg-gradient-to-br from-slate-100 to-slate-200";
+
+  const displayDiscardButton = numPlayers == 2 ? discardedToCrib.length < 2 : discardedToCrib.length < 1;
 
   // Only show card if it's the player's turn
   const displayCard =
@@ -52,7 +57,7 @@ export default function Player({ name, num, hand, turn, crib, numPlayers }: Chil
           onDragStart={handleDragStart}
         />
         <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
-        {crib.length < 4 && (
+        {displayDiscardButton && (
           <button
             onClick={handleDiscard}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2"
