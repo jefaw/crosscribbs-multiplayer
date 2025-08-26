@@ -76,13 +76,14 @@ export default class GameController {
     this.board[2][2] = this.deck[0];
 
     // His Heels
-    if (this.deck[0].value === "J") {
-      if (this.dealer === 1 || this.dealer === 3) {
-        this.totalScores[0] += 2;
-      } else {
-        this.totalScores[1] += 2;
-      }
-    }
+
+    // if (this.deck[0].name === "jack") {
+    //   if (this.dealer === 1 || this.dealer === 3) {
+    //     this.totalScores[0] += 2;
+    //   } else {
+    //     this.totalScores[1] += 2;
+    //   }
+    // }
 
     if (this.numPlayers === 2) {
       this.player1.hand = this.deck?.slice(1, 15) || []; // 14 cards
@@ -190,11 +191,12 @@ export default class GameController {
 
     // Score the crib
     const cutCard = this.board[2][2];
+    let cribKnobsScore = 0;
     if (cutCard) {
       const cribHand: CardType[] = [...this.crib, cutCard];
-      let cribKnobsScore = 0;
+      
       for (const card of this.crib) {
-        if (card.value === "J" && card.suit === cutCard.suit) {
+        if (card.name === "jack" && card.suit === cutCard.suit) {
           cribKnobsScore = 1;
           break;
         }
@@ -203,17 +205,19 @@ export default class GameController {
       // There is no helper function to score a single hand, so I will mock a board
       const cribBoard: BoardType = [cribHand, [], [], [], []];
       this.cribScore = tallyScores(cribBoard)[0]; // only care about the row score
-      const totalCribScore = this.cribScore.total + cribKnobsScore;
-
-      if (this.dealer === 1 || this.dealer === 3) {
-        this.totalScores[0] += totalCribScore;
-      } else {
-        this.totalScores[1] += totalCribScore;
-      }
     }
-
+    // Score the total using round scores
     this.roundScores = tallyScores(this.board, cutCard);
     const [rowRoundScore, columnRoundScore] = this.roundScores;
+    
+    if (this.dealer === 1 || this.dealer === 3) {
+      rowRoundScore.total += this.cribScore?.total || 0;
+      rowRoundScore.total += cribKnobsScore;
+    } else {
+      columnRoundScore.total += this.cribScore?.total || 0;
+      columnRoundScore.total += cribKnobsScore;
+    }
+
     const rowPoints = rowRoundScore.total;
     const columnPoints = columnRoundScore.total;
     const pointDiff = Math.abs(rowPoints - columnPoints);
