@@ -60,6 +60,31 @@ export default class GameController implements GameStateType {
     this.startDealerSelection();
   }
 
+  getPlayer(playerNumber: number): PlayerType {
+    switch (playerNumber) {
+      case 1:
+        return this.player1;
+      case 2:
+        return this.player2;
+      case 3:
+        return this.player3;
+      case 4:
+        return this.player4;
+      default:
+        throw new Error("Invalid player number");
+    }
+  }
+
+  getPlayers() {
+    if (this.numPlayers === 2) {
+      return [this.player1, this.player2];
+    } else if (this.numPlayers === 4) {
+      return [this.player1, this.player2, this.player3, this.player4];
+    } else {
+      throw new Error("Invalid num players");
+    }
+  }
+
   startDealerSelection(): void {
     this.deck = newDeck();
     this.dealerSelectionCards = this.deck.slice(0, this.numPlayers);
@@ -127,42 +152,8 @@ export default class GameController implements GameStateType {
     this.selectedCard = null;
     this.numSpotsLeft--;
 
-    // if (this.numSpotsLeft <= 0) {
-    //   this.roundOver = true;
-    //   this.handleRoundEnd();
-    // }
-
-    if (this.numSpotsLeft <= 0 && !this.forcedToDiscardToCrib()) {
-      this.roundOver = true;
-      this.handleRoundEnd();
-    }
-    // Change turns
     this.nextTurn();
-
     return true;
-  }
-
-  forcedToDiscardToCrib(): boolean {
-    let player: PlayerType;
-    if (this.turn === 1) player = this.player1;
-    else if (this.turn === 2) player = this.player2;
-    else if (this.turn === 3) player = this.player3;
-    else if (this.turn === 4) player = this.player4;
-    else return true;
-
-    let numPlayerMustDiscardToCrib: number;
-    if (this.numPlayers === 2) {
-      numPlayerMustDiscardToCrib = 2;
-    } else {
-      numPlayerMustDiscardToCrib = 1;
-    }
-
-    // player foced to discard to crib
-    if (player.discardedToCrib.length < numPlayerMustDiscardToCrib) {
-      return true;
-    }
-
-    return false;
   }
 
   discardToCrib(numPlayers: number, player: PlayerType, card: CardType): boolean {
@@ -205,16 +196,47 @@ export default class GameController implements GameStateType {
     // Change turns if last card
     if (!hand.length) this.nextTurn();
 
-    if (this.numSpotsLeft <= 0 && !this.forcedToDiscardToCrib()) {
-      this.roundOver = true;
-      this.handleRoundEnd();
+    return true;
+  }
+
+  forcedToDiscardToCrib(player: PlayerType): boolean {
+    let numPlayerMustDiscardToCrib: number;
+    if (this.numPlayers === 2) {
+      numPlayerMustDiscardToCrib = 2;
+    } else {
+      numPlayerMustDiscardToCrib = 1;
     }
 
+    // player foced to discard to crib
+    if (player.discardedToCrib.length < numPlayerMustDiscardToCrib) {
+      return true;
+    }
+
+    return false;
+  }
+
+  isRoundOver() {
+    for (const player of this.getPlayers()) {
+      if (player.hand.length !== 0) {
+        return false;
+      } else if (this.forcedToDiscardToCrib(player)) {
+        return false;
+      }
+    }
     return true;
   }
 
   nextTurn() {
+    if (this.isRoundOver()) {
+      this.roundOver = true;
+      this.handleRoundEnd();
+      return;
+    }
     this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
+    const player = this.getPlayer(this.turn);
+    if (!player.hand.length && !this.forcedToDiscardToCrib(player)) {
+      this.nextTurn(); // if hand is empty then switch to next turn
+    }
     this.updateSelectedCard();
   }
 
@@ -237,7 +259,7 @@ export default class GameController implements GameStateType {
     let cribKnobsScore = 0;
     if (cutCard) {
       const cribHand: CardType[] = [...this.crib, cutCard];
-      
+
       for (const card of this.crib) {
         if (card.name === "jack" && card.suit === cutCard.suit) {
           cribKnobsScore = 1;
@@ -252,7 +274,7 @@ export default class GameController implements GameStateType {
     // Score the total using round scores
     this.roundScores = tallyScores(this.board, cutCard);
     const [rowRoundScore, columnRoundScore] = this.roundScores;
-    
+
     if (this.dealer === 1 || this.dealer === 3) {
       rowRoundScore.total += this.cribScore?.total || 0;
       rowRoundScore.total += cribKnobsScore;
