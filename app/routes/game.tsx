@@ -13,39 +13,33 @@ import { useLocation, useNavigate } from "react-router-dom";
 import DealerSelection from "~/ui/GameSetup/DealerSelection";
 
 export default function Game() {
+  const { gameId } = useParams(); // Get gameId from URL
   const location = useLocation();
   const navigate = useNavigate();
-  const { gameType, numPlayers, playerNames } = location.state || {};
-  const [gameState, setGameState] = useState<GameStateType | null>(null);
+  const [gameState, setGameState] = useState<GameStateType | null>(location.state?.gameState || null); // Get initial gameState
 
   useEffect(() => {
-    console.log("location.state: ", location.state);
-    // Listener functions
-    const handleConnect = () => {
-      console.log("Game Started");
-      socket.emit("startGame", { numPlayers });
-    };
-
-    // if the socket is already connected, call it manually
-    if (socket.connected) {
-      handleConnect();
+    if (!gameId) {
+      navigate("/multiplayer-setup"); // Redirect if no gameId
+      return;
     }
+
+    // No need for handleConnect or emitting startGame here for multiplayer
+    // The game is already started on the server and initial state is passed via location.state
 
     const handleGameUpdate = (state: GameStateType) => {
       console.log("Game state updated", state);
       setGameState(state);
     };
 
-    // Attach listeners
-    socket.on("connect", handleConnect);
+    // Attach listeners for this specific gameId
     socket.on("gameStateUpdate", handleGameUpdate);
 
     // Cleanup on unmount
     return () => {
-      socket.off("connect", handleConnect);
       socket.off("gameStateUpdate", handleGameUpdate);
     };
-  }, []);
+  }, [gameId, navigate, location.state]); // Add gameId, navigate, location.state to dependency array
 
   if (!gameState) {
     return <div>Loading game...</div>;
@@ -56,21 +50,20 @@ export default function Game() {
   }
 
   const handleResetGame = () => {
-    // resetGame();
+    socket.emit("resetGame", { gameId });
   };
 
   const handleBackToMenu = () => {
-    // onGameOver();
-    socket.emit("resetGame");
+    socket.emit("resetGame", { gameId }); // Assuming resetGame also handles leaving the game
     navigate("/");
   };
 
   const playCard = (pos: BoardPosition) => {
-    socket.emit("playCard", pos);
+    socket.emit("playCard", { gameId, pos });
   };
 
   const nextRound = () => {
-    socket.emit("nextRound");
+    socket.emit("nextRound", { gameId });
   };
 
   return (
