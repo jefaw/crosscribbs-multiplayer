@@ -41,6 +41,7 @@ export interface GameStateType {
   dealerSelectionCards: CardType[] | null;
   dealerSelectionComplete: boolean;
   cribScore: ScoreType | null;
+  heels: number; // 0 or 2
   // added ai fields maybe should use instead
 
   // players: PlayerType[];

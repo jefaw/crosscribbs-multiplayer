@@ -156,6 +156,7 @@ export default function Game() {
             dealer={gameState.dealer}
             crib={gameState.crib}
             board={gameState.board}
+            heels={gameState.heels}
           />
         )}
         {gameState.gameOver && (

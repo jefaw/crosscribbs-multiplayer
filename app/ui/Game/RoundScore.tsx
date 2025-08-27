@@ -18,9 +18,10 @@ type ChildProps = {
   dealer: number | null;
   crib: CardType[];
   board: BoardType;
+  heels: number;
 };
 
-export default function RoundScore({ nextRound, roundScores, totalScores, cribScore, dealer, crib, board }: ChildProps) {
+export default function RoundScore({ nextRound, roundScores, totalScores, cribScore, dealer, crib, board, heels }: ChildProps) {
   function scoreDiff() {
     let winner = roundScores[0].total > roundScores[1].total ? "Row" : "Column";
 
@@ -49,6 +50,9 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
             {dealerTeam === "Row" && cribScore && (
               <p className="text-lg">+ {cribPoints} (crib)</p>
             )}
+            {dealerTeam === "Row" && heels > 0 && (
+              <p className="text-lg">+ {heels} (Heels Jack)</p>
+            )}
             <p className="text-1xl">
               {roundScores[0].pairs} (pairs) + {roundScores[0].runs} (runs) + {roundScores[0].fifteens} (fifteens) + {roundScores[0].knobs} (knobs)
             </p>
@@ -62,11 +66,12 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
             {dealerTeam === "Column" && cribScore && (
               <p className="text-lg">+ {cribPoints} (crib)</p>
             )}
+            {dealerTeam === "Column" && heels > 0 && (
+              <p className="text-lg">+ {heels} (Heels - Center Jack)</p>
+            )}
             <p className="text-1xl">
               {roundScores[1].pairs} (pairs) + {roundScores[1].runs} (runs) + {roundScores[1].fifteens} (fifteens) + {roundScores[1].knobs} (knobs)
             </p>
-            
-
             <p className="font-semi-bold text-xl bg-emerald-600 rounded-md mb-1 italic">
               {scoreDiff()} earns {Math.abs(rowTeamRoundScore - colTeamRoundScore)} points!
             </p>

@@ -30,6 +30,7 @@ export default class GameController implements GameStateType {
   dealerSelectionCards: CardType[] | null;
   dealerSelectionComplete: boolean;
   cribScore: ScoreType | null;
+  heels: number; // if his heels was scored this round
 
   constructor(numPlayers = 2) {
     this.numPlayers = numPlayers;
@@ -55,6 +56,7 @@ export default class GameController implements GameStateType {
     this.dealerSelectionCards = null;
     this.dealerSelectionComplete = false;
     this.cribScore = null;
+    this.heels = 0;
 
     // Initialize the game
     this.startDealerSelection();
@@ -100,15 +102,13 @@ export default class GameController implements GameStateType {
     this.deck = newDeck();
     this.board[2][2] = this.deck[0];
 
-    // His Heels
-
-    // if (this.deck[0].name === "jack") {
-    //   if (this.dealer === 1 || this.dealer === 3) {
-    //     this.totalScores[0] += 2;
-    //   } else {
-    //     this.totalScores[1] += 2;
-    //   }
-    // }
+    // His Heels for center jack which gives 2 points to dealer at the end of the round
+    if (this.deck[0].name === "jack") {
+      this.heels = 2;
+    }
+    else{
+      this.heels = 0;
+    }
 
     if (this.numPlayers === 2) {
       this.player1.hand = this.deck?.slice(1, 15) || []; // 14 cards
@@ -278,9 +278,11 @@ export default class GameController implements GameStateType {
     if (this.dealer === 1 || this.dealer === 3) {
       rowRoundScore.total += this.cribScore?.total || 0;
       rowRoundScore.total += cribKnobsScore;
+      rowRoundScore.total += this.heels;
     } else {
       columnRoundScore.total += this.cribScore?.total || 0;
       columnRoundScore.total += cribKnobsScore;
+      columnRoundScore.total += this.heels;
     }
 
     const rowPoints = rowRoundScore.total;
@@ -361,6 +363,7 @@ export default class GameController implements GameStateType {
       dealerSelectionCards: this.dealerSelectionCards,
       dealerSelectionComplete: this.dealerSelectionComplete,
       cribScore: this.cribScore,
+      heels: this.heels,
     };
   }
 
