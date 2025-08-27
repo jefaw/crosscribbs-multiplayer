@@ -6,7 +6,7 @@ import type { ScoreType } from "@shared/types/ScoreType";
 import type { PlayerType } from "@shared/types/PlayerType";
 // import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 
-export default class GameController {
+export default class GameController implements GameStateType {
   numPlayers: number;
   deck: CardType[] | null;
   board: BoardType;
@@ -94,6 +94,12 @@ export default class GameController {
       this.player3.hand = this.deck?.slice(15, 22) || []; // 7 cards
       this.player4.hand = this.deck?.slice(22, 29) || []; // 7 cards
     }
+
+    this.player1.discardedToCrib = [];
+    this.player2.discardedToCrib = [];
+    this.player3.discardedToCrib = [];
+    this.player4.discardedToCrib = [];
+
     this.selectedCard = this.player1.hand[this.player1.hand.length - 1];
   }
 
@@ -121,18 +127,45 @@ export default class GameController {
     this.selectedCard = null;
     this.numSpotsLeft--;
 
-    if (this.numSpotsLeft <= 0) {
+    // if (this.numSpotsLeft <= 0) {
+    //   this.roundOver = true;
+    //   this.handleRoundEnd();
+    // }
+
+    if (this.numSpotsLeft <= 0 && !this.forcedToDiscardToCrib()) {
       this.roundOver = true;
       this.handleRoundEnd();
     }
-
-    this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
-    this.updateSelectedCard();
+    // Change turns
+    this.nextTurn();
 
     return true;
   }
 
-  discardToCrib(numPlayers: number, player: Player, card: CardType): boolean {
+  forcedToDiscardToCrib(): boolean {
+    let player: PlayerType;
+    if (this.turn === 1) player = this.player1;
+    else if (this.turn === 2) player = this.player2;
+    else if (this.turn === 3) player = this.player3;
+    else if (this.turn === 4) player = this.player4;
+    else return true;
+
+    let numPlayerMustDiscardToCrib: number;
+    if (this.numPlayers === 2) {
+      numPlayerMustDiscardToCrib = 2;
+    } else {
+      numPlayerMustDiscardToCrib = 1;
+    }
+
+    // player foced to discard to crib
+    if (player.discardedToCrib.length < numPlayerMustDiscardToCrib) {
+      return true;
+    }
+
+    return false;
+  }
+
+  discardToCrib(numPlayers: number, player: PlayerType, card: CardType): boolean {
     if (player.num !== this.turn) return false;
 
     if (numPlayers === 2 && player.discardedToCrib.length >= 2) {
@@ -169,10 +202,20 @@ export default class GameController {
       return false; // card not in hand
     }
 
-    this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
-    this.updateSelectedCard();
+    // Change turns if last card
+    if (!hand.length) this.nextTurn();
+
+    if (this.numSpotsLeft <= 0 && !this.forcedToDiscardToCrib()) {
+      this.roundOver = true;
+      this.handleRoundEnd();
+    }
 
     return true;
+  }
+
+  nextTurn() {
+    this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
+    this.updateSelectedCard();
   }
 
   updateSelectedCard(): void {
