@@ -256,16 +256,8 @@ export default class GameController implements GameStateType {
 
     // Score the crib
     const cutCard = this.board[2][2];
-    let cribKnobsScore = 0;
     if (cutCard) {
       const cribHand: CardType[] = [...this.crib, cutCard];
-
-      for (const card of this.crib) {
-        if (card.name === "jack" && card.suit === cutCard.suit) {
-          cribKnobsScore = 1;
-          break;
-        }
-      }
 
       // There is no helper function to score a single hand, so I will mock a board
       const cribBoard: BoardType = [cribHand, [], [], [], []];
@@ -277,11 +269,9 @@ export default class GameController implements GameStateType {
 
     if (this.dealer === 1 || this.dealer === 3) {
       rowRoundScore.total += this.cribScore?.total || 0;
-      rowRoundScore.total += cribKnobsScore;
       rowRoundScore.total += this.heels;
     } else {
       columnRoundScore.total += this.cribScore?.total || 0;
-      columnRoundScore.total += cribKnobsScore;
       columnRoundScore.total += this.heels;
     }
 

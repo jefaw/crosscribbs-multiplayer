@@ -67,8 +67,9 @@ function calculateScore(board: BoardType, cutCard?: CardType) {
 
     // His Knobs on the board
     if (cutCard && i === 2) {
-      for (const card of row) {
-        if (card && card.value === "J" && card.suit === cutCard.suit) {
+      for (const [j, card] of row.entries()) {
+        if (j === 2) continue; // Skip the cut card
+        if (card && card.name === "jack" && card.suit === cutCard.suit) {
           knobsScore = 1;
           knobsTotal += 1;
           break;
