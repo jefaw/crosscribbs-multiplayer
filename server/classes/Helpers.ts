@@ -126,7 +126,8 @@ function calculateScore(board: BoardType, cutCard?: CardType) {
         else runScore += 3 * multiplier;
       }
     }
-
+    pairTotal += pairScore;
+    runTotal += runScore;
     fifteenTotal += fifteenScore;
     rowScore = pairScore + runScore + fifteenScore + knobsScore;
     score += rowScore;
