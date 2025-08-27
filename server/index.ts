@@ -49,11 +49,52 @@ const gameState = {
   message: "Waiting for players...",
 };
 
+// Multiplayer Games
+const games = {}; // { gameId: { hostId, players: [], state: null } }
+
 // create a local 2 player game
 let game: GameController;
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
+
+  // Multiplayer Sockets
+
+  // Host creates a game
+  socket.on("createMultiplayerGame", () => {
+    const gameId = generateGameId(); // e.g. shortid or uuid
+    games[gameId] = {
+      hostId: socket.id,
+      players: [socket.id],
+      state: "waiting",
+    };
+    socket.join(gameId);
+    socket.emit("gameCreated", { gameId });
+  });
+
+  // Player joins a game
+  socket.on("joinMultiplayerGame", ({ gameId }) => {
+    const game = games[gameId];
+    if (game && game.state === "waiting") {
+      game.players.push(socket.id);
+      socket.join(gameId);
+
+      // Update everyone in the lobby
+      io.to(gameId).emit("lobbyUpdate", { players: game.players });
+    } else {
+      socket.emit("error", { message: "Game not found or already started." });
+    }
+  });
+
+  // Host starts the game
+  socket.on("startGame", ({ gameId }) => {
+    const game = games[gameId];
+    if (game && game.hostId === socket.id) {
+      game.state = "playing";
+      // initialize deck, hands, etc
+      io.to(gameId).emit("gameStart", { players: game.players });
+    }
+  });
 
   socket.on("startGame", ({ numPlayers }) => {
     game = new GameController(numPlayers);
