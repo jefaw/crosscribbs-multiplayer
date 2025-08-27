@@ -38,69 +38,89 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
 
   return (
     <div
-      className="absolute inset-0 mx-auto my-auto w-[330px] h-[650px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
-      transition-opacity ease-in duration-700 overflow-auto"
+      className="absolute inset-0 mx-auto my-auto w-[500px] h-[700px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
+      transition-opacity ease-in duration-700"
     >
       <h2 className="text-center text-3xl mb-3">Round Summary</h2>
+      <p className="font-semi-bold text-lg bg-emerald-600 rounded-md mb-1 italic w-fit px-4 mx-auto">
+        {scoreDiff()} earns {Math.abs(rowTeamRoundScore - colTeamRoundScore)} points!
+      </p>
       <div className="flex flex-col">
-        <div className="w-full flex justify-center mb-3 text-center">
+        <div className="w-full flex justify-around mb-1 text-center">
           <div>
-            <h3 className="font-bold text-3xl text-cyan-400">Row</h3>
-            <p className="text-2xl text-cyan-400">Round Score: {rowTeamRoundScore}</p>
-            {dealerTeam === "Row" && cribScore && (
-              <p className="text-lg">+ {cribPoints} (crib)</p>
-            )}
-            {dealerTeam === "Row" && heels > 0 && (
-              <p className="text-lg">+ {heels} (Heels Jack)</p>
-            )}
-            <p className="text-1xl">
-              {roundScores[0].pairs} (pairs) + {roundScores[0].runs} (runs) + {roundScores[0].fifteens} (fifteens) + {roundScores[0].knobs} (knobs)
-            </p>
+            <h3 className="font-bold text-2xl text-cyan-400">Row</h3>
+            <p className="text-xl text-cyan-400">Round Score: {rowTeamRoundScore}</p>
+            <div className="text-left">
+              {dealerTeam === "Row" && cribScore && (
+                <p className="text-orange-400">{cribPoints} (crib)</p>
+              )}
+              {dealerTeam === "Row" && heels > 0 && (
+                <p className="text-orange-400">{heels} (Heels Jack)</p>
+              )}
+            </div>
+            <div className="text-left">
+              <p>{roundScores[0].pairs} (pairs)</p>
+              <p>{roundScores[0].runs} (runs)</p>
+              <p>{roundScores[0].fifteens} (fifteens)</p>
+              <p>{roundScores[0].knobs} (knobs)</p>
+            </div>
             
           </div>
-        </div>
-        <div className="w-full flex justify-center mb-3 text-center ">
           <div>
-            <h3 className="font-bold text-3xl text-fuchsia-400">Column</h3>
-            <p className="text-2xl text-fuchsia-400">Round Score: {colTeamRoundScore}</p>
-            {dealerTeam === "Column" && cribScore && (
-              <p className="text-lg">+ {cribPoints} (crib)</p>
-            )}
-            {dealerTeam === "Column" && heels > 0 && (
-              <p className="text-lg">+ {heels} (Heels - Center Jack)</p>
-            )}
-            <p className="text-1xl">
-              {roundScores[1].pairs} (pairs) + {roundScores[1].runs} (runs) + {roundScores[1].fifteens} (fifteens) + {roundScores[1].knobs} (knobs)
-            </p>
-            <p className="font-semi-bold text-xl bg-emerald-600 rounded-md mb-1 italic">
-              {scoreDiff()} earns {Math.abs(rowTeamRoundScore - colTeamRoundScore)} points!
-            </p>
-          </div>
+            <h3 className="font-bold text-2xl text-fuchsia-400">Column</h3>
+            <p className="text-xl text-fuchsia-400">Round Score: {colTeamRoundScore}</p>
+            <div className="text-left">
+              {dealerTeam === "Column" && cribScore && (
+                <p className="text-orange-400">{cribPoints} (crib)</p>
+              )}
+              {dealerTeam === "Column" && heels > 0 && (
+                <p className="text-orange-400">{heels} (Heels - Center Jack)</p>
+              )}
+            </div>
+            <div className="text-left">
+              <p>{roundScores[1].pairs} (pairs)</p>
+              <p>{roundScores[1].runs} (runs)</p>
+              <p>{roundScores[1].fifteens} (fifteens)</p>
+              <p>{roundScores[1].knobs} (knobs)</p>
+            </div>
+            </div>
         </div>
         {cribScore && (
-          <div className="w-full flex justify-center mb-3 text-center">
-            <div>
+          <div className="w-full flex justify-center mb-2 text-center">
+            <div className="bg-slate-700 rounded-lg p-2">
               <h3 className="font-bold text-2xl">Crib ({dealerTeam})</h3>
               <div className="flex justify-center space-x-1 my-2">
                 {cribHand.map((card, i) => (
                   <img key={i} src={`/cards/fronts/${card.suit}_${card.name}.svg`} alt={`${card.name} of ${card.suit}`} className="w-16 h-auto" />
                 ))}
               </div>
-              <p className="text-xl">{cribScore.total} points</p>
-              <p className="text-sm">
-                {cribScore.pairs} (pairs) + {cribScore.runs} (runs) + {cribScore.fifteens} (fifteens) + {cribScore.knobs} (knobs)
-              </p>
+              <p className="text-2xl font-bold">{cribScore.total} points</p>
+              <div className="flex justify-around mt-2">
+                <p>{cribScore.pairs} (pairs)</p>
+                <p>{cribScore.runs} (runs)</p>
+                <p>{cribScore.fifteens} (fifteens)</p>
+              </div>
             </div>
           </div>  
         )}
-        <h3 className="text-center text-2xl mt-2 bg-red-400">Total Scores</h3>
-        <p className="text-xl mb-2">Row: {totalScores[0]}</p>
-        <p className="text-xl">Column: {totalScores[1]}</p>
+        <div className="bg-slate-700 rounded-lg p-2 mt-2">
+          <h3 className="text-center text-xl">Total Scores</h3>
+          <div className="flex justify-around mt-1">
+            <div className="text-center">
+              <p className="text-cyan-400 text-xl font-bold">Row</p>
+              <p className="text-2xl">{totalScores[0]}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-fuchsia-400 text-xl font-bold">Column</p>
+              <p className="text-2xl">{totalScores[1]}</p>
+            </div>
+          </div>
+        </div>
         <button
-          className="bg-amber-400 text-black rounded-xl text-2xl border-white border-2 hover:bg-yellow-500 mx-4 mt-4"
+          className="w-full bg-blue-500 text-white font-bold rounded-xl text-2xl border-white border-2 hover:bg-blue-600 py-2 mt-2 transition-colors duration-300 cursor-pointer"
           onClick={nextRound}
         >
-          <span className="drop-shadow-md ">Next Round</span>
+          Next Round
         </button>
       </div>
     </div>
