@@ -4,11 +4,13 @@ import RoundScore from "~/ui/Game/RoundScore";
 import GameOver from "~/ui/Game/GameOver";
 import TurnIndicator from "~/ui/Game/TurnIndicator";
 import RoundHistory from "~/ui/Game/RoundHistory";
+import BottomHud from "~/ui/Game/BottomHud";
 import { useEffect, useState } from "react";
 import type { GameStateType } from "@shared/types/GameControllerTypes";
 import type { BoardPosition } from "@shared/types/BoardTypes";
 import { socket } from "../connections/socket";
 import { useLocation, useNavigate } from "react-router-dom";
+import DealerSelection from "~/ui/GameSetup/DealerSelection";
 
 export default function Game() {
   const location = useLocation();
@@ -49,6 +51,10 @@ export default function Game() {
     return <div>Loading game...</div>;
   }
 
+  if (!gameState.dealerSelectionComplete) {
+    return <DealerSelection dealerSelectionCards={gameState.dealerSelectionCards} playerNames={playerNames} />;
+  }
+
   const handleResetGame = () => {
     // resetGame();
   };
@@ -67,8 +73,6 @@ export default function Game() {
     socket.emit("nextRound");
   };
 
-  const hands = [gameState.hand1, gameState.hand2, gameState.hand3, gameState.hand4];
-
   return (
     <div className="bg-green-600">
       <div className="flex flex-col xl:flex-row relative">
@@ -85,11 +89,31 @@ export default function Game() {
           </div>
           {numPlayers === 4 && (
             <>
-              <Player name={playerNames[0]} num={1} hand={hands[0]} turn={gameState.turn} />
-              <Player name={playerNames[2]} num={3} hand={hands[2]} turn={gameState.turn} />
+              <Player
+                name={playerNames[0]}
+                player={gameState.player1}
+                turn={gameState.turn}
+                crib={gameState.crib}
+                numPlayers={numPlayers}
+              />
+              <Player
+                name={playerNames[2]}
+                player={gameState.player3}
+                turn={gameState.turn}
+                crib={gameState.crib}
+                numPlayers={numPlayers}
+              />
             </>
           )}
-          {numPlayers === 2 && <Player name={playerNames[0]} num={1} hand={hands[0]} turn={gameState.turn} />}
+          {numPlayers === 2 && (
+            <Player
+              name={playerNames[0]}
+              player={gameState.player1}
+              turn={gameState.turn}
+              crib={gameState.crib}
+              numPlayers={numPlayers}
+            />
+          )}
         </div>
         <div className="w-full xl:w-1/2">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
@@ -97,14 +121,42 @@ export default function Game() {
         <div className="w-full xl:w-1/4">
           {numPlayers === 4 && (
             <>
-              <Player name={playerNames[1]} num={2} hand={hands[1]} turn={gameState.turn} />
-              <Player name={playerNames[3]} num={4} hand={hands[3]} turn={gameState.turn} />
+              <Player
+                name={playerNames[1]}
+                player={gameState.player2}
+                turn={gameState.turn}
+                crib={gameState.crib}
+                numPlayers={numPlayers}
+              />
+              <Player
+                name={playerNames[3]}
+                player={gameState.player4}
+                turn={gameState.turn}
+                crib={gameState.crib}
+                numPlayers={numPlayers}
+              />
             </>
           )}
-          {numPlayers === 2 && <Player name={playerNames[1]} num={2} hand={hands[1]} turn={gameState.turn} />}
+          {numPlayers === 2 && (
+            <Player
+              name={playerNames[1]}
+              player={gameState.player2}
+              turn={gameState.turn}
+              crib={gameState.crib}
+              numPlayers={numPlayers}
+            />
+          )}
         </div>
         {gameState.roundScoreVisible && !gameState.gameOver && (
-          <RoundScore nextRound={nextRound} roundScores={gameState.roundScores} totalScores={gameState.totalScores} />
+          <RoundScore
+            nextRound={nextRound}
+            roundScores={gameState.roundScores}
+            totalScores={gameState.totalScores}
+            cribScore={gameState.cribScore}
+            dealer={gameState.dealer}
+            crib={gameState.crib}
+            board={gameState.board}
+          />
         )}
         {gameState.gameOver && (
           <GameOver
@@ -115,7 +167,7 @@ export default function Game() {
             onBackToMenu={handleBackToMenu}
           />
         )}
-        {!gameState.gameOver && <TurnIndicator turn={gameState.turn} playerNames={playerNames} />}
+        {!gameState.gameOver && <BottomHud gameState={gameState} playerNames={playerNames} />}
         <RoundHistory roundHistory={gameState.roundHistory} />
       </div>
     </div>
