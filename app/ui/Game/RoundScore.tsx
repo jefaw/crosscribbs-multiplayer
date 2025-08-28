@@ -62,6 +62,7 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
               <p>{roundScores[0].pairs} (pairs)</p>
               <p>{roundScores[0].runs} (runs)</p>
               <p>{roundScores[0].fifteens} (fifteens)</p>
+              <p>{roundScores[0].flushes} (flushes)</p>
               <p>{roundScores[0].knobs} (knobs)</p>
             </div>
             
@@ -81,6 +82,7 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
               <p>{roundScores[1].pairs} (pairs)</p>
               <p>{roundScores[1].runs} (runs)</p>
               <p>{roundScores[1].fifteens} (fifteens)</p>
+              <p>{roundScores[1].flushes} (flushes)</p>
               <p>{roundScores[1].knobs} (knobs)</p>
             </div>
             </div>
@@ -99,6 +101,7 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
                 <p>{cribScore.pairs} (pairs)</p>
                 <p>{cribScore.runs} (runs)</p>
                 <p>{cribScore.fifteens} (fifteens)</p>
+                <p>{cribScore.flushes} (flushes)</p>
               </div>
             </div>
           </div>  

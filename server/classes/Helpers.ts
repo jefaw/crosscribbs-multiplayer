@@ -57,6 +57,7 @@ function calculateScore(board: BoardType, cutCard?: CardType) {
   let runTotal = 0;
   let fifteenTotal = 0;
   let knobsTotal = 0;
+  let flushTotal = 0; // Added flushTotal
   // Assuming grid is a 2D array
   for (const [i, row] of board.entries()) {
     let rowScore = 0;
@@ -64,6 +65,7 @@ function calculateScore(board: BoardType, cutCard?: CardType) {
     let runScore = 0;
     let fifteenScore = 0;
     let knobsScore = 0;
+    let flushScore = 0; // Added flushScore
 
     // His Knobs on the board
     if (cutCard && i === 2) {
@@ -130,10 +132,13 @@ function calculateScore(board: BoardType, cutCard?: CardType) {
     pairTotal += pairScore;
     runTotal += runScore;
     fifteenTotal += fifteenScore;
-    rowScore = pairScore + runScore + fifteenScore + knobsScore;
+    flushScore = calculateFlush(row); // Calculate flush score for the row
+    flushTotal += flushScore; // Add to total flush score
+
+    rowScore = pairScore + runScore + fifteenScore + knobsScore + flushScore; // Include flushScore
     score += rowScore;
     console.log(
-      `Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) + (Knobs: ${knobsScore}) = ${rowScore}`
+      `Score for row: (Pairs: ${pairScore}) + (Runs: ${runScore}) + (Fifteens: ${fifteenScore}) + (Knobs: ${knobsScore}) + (Flushes: ${flushScore}) = ${rowScore}` // Updated console.log
     );
 
     rowScore = 0;
@@ -144,8 +149,26 @@ function calculateScore(board: BoardType, cutCard?: CardType) {
     // Can keep total scores for pairs and runs as well
   }
 
-  const scoreTotals = new Score(pairTotal, runTotal, fifteenTotal, knobsTotal);
+  const scoreTotals = new Score(pairTotal, runTotal, fifteenTotal, knobsTotal, flushTotal);
   return scoreTotals;
+}
+
+function calculateFlush(row: (CardType | null)[]): number {
+  const suitCounts: Record<string, number> = {};
+
+  for (const card of row) {
+    if (card) {
+      suitCounts[card.suit] = (suitCounts[card.suit] || 0) + 1;
+    }
+  }
+
+  let flushScore = 0;
+  for (const count of Object.values(suitCounts)) {
+    if (count === 5) return 5; // full flush
+    if (count === 4) flushScore = 4; // track 4-flush if no 5-flush
+  }
+
+  return flushScore;
 }
 
 function calculateFifteen(array: (CardType | null)[], targetSum = 15) {
