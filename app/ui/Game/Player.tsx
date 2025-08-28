@@ -8,6 +8,7 @@
 import type { CardType } from "@shared/types/CardType";
 import type { PlayerType } from "@shared/types/PlayerType";
 import { socket } from "~/connections/socket";
+import Card from "./Card";
 
 type ChildProps = {
   name: String;
@@ -23,7 +24,6 @@ export default function Player({ name, player, turn, crib, numPlayers }: ChildPr
 
   //Get top card
   const card = hand.length > 0 ? hand[hand.length - 1] : false;
-  const backImgSrc = `cards/backs/red2.svg`; // can be changed in future
 
   function handleDragStart(e: any) {
     e.dataTransfer.effectAllowed = "move"; // don't show plus icon on drag
@@ -49,40 +49,44 @@ export default function Player({ name, player, turn, crib, numPlayers }: ChildPr
   // Only show card if it's the player's turn
   const displayCard =
     isActive && card ? (
-      <div className="flex flex-col items-center space-y-2 h-66">
-        <img
-          className="w-32 h-45 self-center hover:border-gray-700 border-transparent border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105"
-          src={card.frontImgSrc}
-          alt=""
+      <div className="flex flex-col items-center space-y-1 h-48">
+        <Card
+          card={card}
+          isFaceUp={true}
           draggable={true}
           onDragStart={handleDragStart}
+          className="w-24 h-36 self-center hover:border-gray-700 border-transparent border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105"
         />
-        <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
+        <p className="text-sm font-medium text-gray-700">Cards: {hand.length}</p>
 
         {displayDiscardButton && (
           <button
             onClick={handleDiscard}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm"
           >
-            Discard to Crib
+            Discard
           </button>
         )}
       </div>
     ) : (
-      <div className="flex flex-col items-center space-y-2 h-66">
-        <img className="w-32 h-45 self-center rounded-lg shadow-lg" src={backImgSrc} alt="" draggable={false} />
-        <p className="text-base font-medium text-gray-700">Cards remaining: {hand.length}</p>
+      <div className="flex flex-col items-center space-y-1 h-48">
+        {card ? (
+          <Card card={card} isFaceUp={false} className="w-24 h-36 self-center rounded-lg shadow-lg" />
+        ) : (
+          <div className="w-24 h-36 self-center rounded-lg shadow-lg bg-gray-300 flex items-center justify-center text-gray-500 text-xs">No Card</div>
+        )}
+        <p className="text-sm font-medium text-gray-700">Cards: {hand.length}</p>
       </div>
     );
 
-  const noCard = <div className="h-66"></div>; // card height: 51 + p height: 5 + y-spcaing: 2
+  const noCard = <div className="h-48"></div>; // Adjusted height
 
   return (
     <>
       <div
-        className={`flex flex-col justify-center ${bgGradient} m-8 py-4 px-4 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
+        className={`flex flex-col justify-center ${bgGradient} p-2 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
       >
-        <h1 className="text-center text-xl font-bold mb-3 text-gray-800">{name}</h1>
+        <h1 className="text-center text-lg font-bold mb-1 text-gray-800">{name}</h1>
         {card ? displayCard : noCard}
       </div>
     </>

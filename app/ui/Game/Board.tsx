@@ -35,7 +35,7 @@ export default function Board({ board, selectedCard, playCard }: ChildProps) {
 
   return (
     <div>
-      <table className="flex justify-center border-separate border-spacing-2">
+      <table className="flex justify-center border-separate border-spacing-1 w-full">
         <tbody>{displayBoard}</tbody>
       </table>
     </div>

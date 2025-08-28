@@ -43,7 +43,7 @@ function newDeck() {
 export { newBoard, newDeck, tallyScores };
 
 //Scoring
-function tallyScores(board: BoardType, cutCard?: CardType) {
+function tallyScores(board: BoardType, cutCard?: CardType | null) {
   const rowScore = calculateScore(board, cutCard);
   const colScore = calculateScore(transpose(board), cutCard);
 
@@ -51,7 +51,7 @@ function tallyScores(board: BoardType, cutCard?: CardType) {
 }
 
 //returns a score object
-function calculateScore(board: BoardType, cutCard?: CardType) {
+function calculateScore(board: BoardType, cutCard?: CardType | null) {
   let score = 0;
   let pairTotal = 0;
   let runTotal = 0;
@@ -182,10 +182,11 @@ function calculateFifteen(array: (CardType | null)[], targetSum = 15) {
     }
 
     for (let i = startIndex; i < array.length; i++) {
-      if (!array[i]) return;
-      if (currentSum + Math.min(array[i]!.value, 10) <= targetSum) {
+      const card = array[i];
+      if (!card) continue;
+      if (currentSum + Math.min(card.value, 10) <= targetSum) {
         // Faces count as 10
-        subsetSumsHelper(currentSum + Math.min(array[i]!.value, 10), i + 1, [...path, array[i]!.value]);
+        subsetSumsHelper(currentSum + Math.min(card.value, 10), i + 1, [...path, card.value]);
       }
     }
   }

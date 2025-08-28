@@ -7,7 +7,7 @@
   - Winner and point difference
 */
 
-import type { BoardType } from "@shared/types/BoardTypes";
+import type { BoardType } from "@shared/types/GameControllerTypes";
 import type { CardType } from "@shared/types/CardType";
 
 type ChildProps = {
@@ -38,18 +38,18 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
 
   return (
     <div
-      className="absolute inset-0 mx-auto my-auto w-[500px] h-[700px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
+      className="absolute inset-0 mx-auto my-auto w-[400px] h-[600px] p-4 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
       transition-opacity ease-in duration-700"
     >
-      <h2 className="text-center text-3xl mb-3">Round Summary</h2>
-      <p className="font-semi-bold text-lg bg-emerald-600 rounded-md mb-1 italic w-fit px-4 mx-auto">
+      <h2 className="text-center text-2xl mb-2">Round Summary</h2>
+      <p className="font-semi-bold text-base bg-emerald-600 rounded-md mb-0 italic w-fit px-4 mx-auto">
         {scoreDiff()} earns {Math.abs(rowTeamRoundScore - colTeamRoundScore)} points!
       </p>
       <div className="flex flex-col">
-        <div className="w-full flex justify-around mb-1 text-center">
+        <div className="w-full flex justify-around mb-0 text-center">
           <div>
-            <h3 className="font-bold text-2xl text-cyan-400">Row</h3>
-            <p className="text-xl text-cyan-400">Round Score: {rowTeamRoundScore}</p>
+            <h3 className="font-bold text-xl text-cyan-400">Row</h3>
+            <p className="text-lg text-cyan-400">Round Score: {rowTeamRoundScore}</p>
             <div className="text-left">
               {dealerTeam === "Row" && cribScore && (
                 <p className="text-orange-400">{cribPoints} (crib)</p>
@@ -68,8 +68,8 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
             
           </div>
           <div>
-            <h3 className="font-bold text-2xl text-fuchsia-400">Column</h3>
-            <p className="text-xl text-fuchsia-400">Round Score: {colTeamRoundScore}</p>
+            <h3 className="font-bold text-xl text-fuchsia-400">Column</h3>
+            <p className="text-lg text-fuchsia-400">Round Score: {colTeamRoundScore}</p>
             <div className="text-left">
               {dealerTeam === "Column" && cribScore && (
                 <p className="text-orange-400">{cribPoints} (crib)</p>
@@ -88,15 +88,15 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
             </div>
         </div>
         {cribScore && (
-          <div className="w-full flex justify-center mb-2 text-center">
+          <div className="w-full flex justify-center mb-1 text-center">
             <div className="bg-slate-700 rounded-lg p-2">
-              <h3 className="font-bold text-2xl">Crib ({dealerTeam})</h3>
-              <div className="flex justify-center space-x-1 my-2">
+              <h3 className="font-bold text-xl">Crib ({dealerTeam})</h3>
+              <div className="flex justify-center space-x-1 my-1">
                 {cribHand.map((card, i) => (
-                  <img key={i} src={`/cards/fronts/${card.suit}_${card.name}.svg`} alt={`${card.name} of ${card.suit}`} className="w-16 h-auto" />
+                  <img key={i} src={`/cards/fronts/${card.suit}_${card.name}.svg`} alt={`${card.name} of ${card.suit}`} className="w-12 h-auto" />
                 ))}
               </div>
-              <p className="text-2xl font-bold">{cribScore.total} points</p>
+              <p className="text-xl font-bold">{cribScore.total} points</p>
               <div className="flex justify-around mt-2">
                 <p>{cribScore.pairs} (pairs)</p>
                 <p>{cribScore.runs} (runs)</p>
@@ -106,21 +106,21 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
             </div>
           </div>  
         )}
-        <div className="bg-slate-700 rounded-lg p-2 mt-2">
-          <h3 className="text-center text-xl">Total Scores</h3>
+        <div className="bg-slate-700 rounded-lg p-2 mt-1">
+          <h3 className="text-center text-lg">Total Scores</h3>
           <div className="flex justify-around mt-1">
             <div className="text-center">
-              <p className="text-cyan-400 text-xl font-bold">Row</p>
-              <p className="text-2xl">{totalScores[0]}</p>
+              <p className="text-cyan-400 text-lg font-bold">Row</p>
+              <p className="text-xl">{totalScores[0]}</p>
             </div>
             <div className="text-center">
-              <p className="text-fuchsia-400 text-xl font-bold">Column</p>
-              <p className="text-2xl">{totalScores[1]}</p>
+              <p className="text-fuchsia-400 text-lg font-bold">Column</p>
+              <p className="text-xl">{totalScores[1]}</p>
             </div>
           </div>
         </div>
         <button
-          className="w-full bg-blue-500 text-white font-bold rounded-xl text-2xl border-white border-2 hover:bg-blue-600 py-2 mt-2 transition-colors duration-300 cursor-pointer"
+          className="w-full bg-blue-500 text-white font-bold rounded-xl text-xl border-white border-2 hover:bg-blue-600 py-1 mt-1 transition-colors duration-300 cursor-pointer"
           onClick={nextRound}
         >
           Next Round

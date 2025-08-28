@@ -30,25 +30,7 @@ export default function GameOver({ winner, totalScores, resetGame, roundHistory,
           </div>
         </div>
 
-        <div className="mt-4 mb-4">
-          <h3 className="text-lg font-bold mb-2">Round History</h3>
-          <div className="space-y-2">
-            {roundHistory.map((round) => (
-              <div key={round.round} className="text-sm border-b border-slate-500 pb-1">
-                <div className="flex justify-between">
-                  <span>Round {round.round}:</span>
-                  <span className={round.winner === "Row" ? "text-cyan-400" : "text-fuchsia-400"}>
-                    {round.winner} +{round.pointDiff}
-                  </span>
-                </div>
-                <div className="flex justify-between text-xs text-slate-300">
-                  <span>Row: {round.rowScore}</span>
-                  <span>Column: {round.columnScore}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        
 
         <div className="space-y-2 mt-auto">
           <button
@@ -57,12 +39,7 @@ export default function GameOver({ winner, totalScores, resetGame, roundHistory,
           >
             Play Again
           </button>
-          <button
-            onClick={onBackToMenu}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
-          >
-            Back to Menu
-          </button>
+          
         </div>
       </div>
     </div>

@@ -1,22 +1,27 @@
+import React from 'react';
 import type { CardType } from "@shared/types/CardType";
+import Card from "./Card";
 
 interface CribProps {
-  crib: CardType[];
-  dealer: number | null;
+  cribCards?: CardType[] | null;
 }
 
-export default function Crib({ crib, dealer }: CribProps) {
-  const backImgSrc = `cards/backs/red2.svg`;
-  const dealerTeam = dealer ? (dealer % 2 !== 0 ? "Row" : "Column") : "";
-
+const Crib: React.FC<CribProps> = ({ cribCards }) => {
   return (
-    <div className="bg-gray-800 p-2 rounded-lg shadow-lg">
-      <h3 className="text-white text-center font-bold mb-1 text-sm">Crib: {dealerTeam}</h3>
-      <div className="flex space-x-1">
-        {crib.map((card, i) => (
-          <img key={i} className="w-12 h-auto rounded-md shadow-lg" src={backImgSrc} alt="Card back" />
+    <div className="bg-gray-700 text-white p-4 rounded-lg mb-4">
+      <h3 className="text-lg font-bold mb-2">Crib</h3>
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: cribCards?.length || 0 }).map((_, index) => (
+          <img
+            key={index}
+            src="/cards/backs/blue.svg"
+            alt="Card Back"
+            className="w-20 h-28 object-contain"
+          />
         ))}
       </div>
     </div>
   );
-}
+};
+
+export default Crib;
