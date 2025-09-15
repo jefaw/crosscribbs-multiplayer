@@ -4,6 +4,7 @@ import Player from "./classes/Player";
 import type { CardType } from "@shared/types/CardType";
 import type { ScoreType } from "@shared/types/ScoreType";
 import type { PlayerType } from "@shared/types/PlayerType";
+import type { BoardPosition } from "@shared/types/BoardTypes";
 // import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 
 export default class GameController implements GameStateType {
@@ -87,6 +88,15 @@ export default class GameController implements GameStateType {
     }
   }
 
+  applyMove(move: BoardPosition): boolean {
+    const valid = this.isValidMove(move);
+    if (valid && this.playCard(move)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   startDealerSelection(): void {
     this.deck = newDeck();
     this.dealerSelectionCards = this.deck.slice(0, this.numPlayers);
@@ -105,8 +115,7 @@ export default class GameController implements GameStateType {
     // His Heels for center jack which gives 2 points to dealer at the end of the round
     if (this.deck[0].name === "jack") {
       this.heels = 2;
-    }
-    else{
+    } else {
       this.heels = 0;
     }
 

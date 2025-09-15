@@ -7,6 +7,17 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import GameController from "./gameController";
+import { getGame, games, deleteGame } from "./classes/gameHelpers";
+
+interface Player {
+  id: string;
+  name: string;
+}
+
+interface Lobby {
+  players: Player[];
+  host: string;
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,107 +60,112 @@ const gameState = {
   message: "Waiting for players...",
 };
 
-// Multiplayer Games
-const games = {}; // { gameId: { hostId, players: [], state: null } }
-
-// create a local 2 player game
-let game: GameController;
-
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  // Multiplayer Sockets
+  const lobbies: Record<string, Lobby> = {}; // { lobbyId: { players: [], host: socketId }}
+  const games: Record<string, GameController> = {};
+  let lobbyCounter = 1;
 
-  // Host creates a game
-  socket.on("createMultiplayerGame", () => {
-    const gameId = generateGameId(); // e.g. shortid or uuid
-    games[gameId] = {
-      hostId: socket.id,
-      players: [socket.id],
-      state: "waiting",
-    };
-    socket.join(gameId);
-    socket.emit("gameCreated", { gameId });
+  // Create Lobby
+  socket.on("createLobby", (username, callback) => {
+    const lobbyId = String(lobbyCounter++);
+    lobbies[lobbyId] = { players: [{ id: socket.id, name: username }], host: socket.id };
+    socket.join(lobbyId);
+    callback({ lobbyId });
+    io.to(lobbyId).emit("lobbyUpdate", lobbies[lobbyId]);
   });
 
-  // Player joins a game
-  socket.on("joinMultiplayerGame", ({ gameId }) => {
-    const game = games[gameId];
-    if (game && game.state === "waiting") {
-      game.players.push(socket.id);
-      socket.join(gameId);
+  // Join Lobby
+  socket.on("joinLobby", (lobbyId, username, callback) => {
+    if (!lobbies[lobbyId]) {
+      callback({ error: "Lobby not found" });
+      return;
+    }
+    lobbies[lobbyId].players.push({ id: socket.id, name: username });
+    socket.join(lobbyId);
+    callback({ lobbyId });
+    io.to(lobbyId).emit("lobbyUpdate", lobbies[lobbyId]);
+  });
 
-      // Update everyone in the lobby
-      io.to(gameId).emit("lobbyUpdate", { players: game.players });
+  socket.on("startGame", ({ numPlayers, lobbyId }) => {
+    if (lobbyId) {
+      // Multiplayer game tied to a lobby
+      games[lobbyId] = new GameController(numPlayers);
+      io.to(lobbyId).emit("gameStateUpdate", games[lobbyId].getGameState());
+      console.log(`Multiplayer game started in lobby ${lobbyId}`);
     } else {
-      socket.emit("error", { message: "Game not found or already started." });
+      // Local game (hosted just on this client)
+      const localLobbyId = socket.id; // unique socket id i.e "42SXdaf123"
+      games[localLobbyId] = new GameController(numPlayers);
+      socket.emit("gameStateUpdate", games[localLobbyId].getGameState());
+      console.log(`Local game started for ${socket.id}`);
     }
-  });
-
-  // Host starts the game
-  socket.on("startGame", ({ gameId }) => {
-    const game = games[gameId];
-    if (game && game.hostId === socket.id) {
-      game.state = "playing";
-      // initialize deck, hands, etc
-      io.to(gameId).emit("gameStart", { players: game.players });
-    }
-  });
-
-  socket.on("startGame", ({ numPlayers }) => {
-    game = new GameController(numPlayers);
-    io.emit("gameStateUpdate", game.getGameState());
-    console.log("Game Started");
   });
 
   // Handle "startGame" event
-  socket.on("resetGame", () => {
+  socket.on("resetGame", ({ lobbyId }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (!game) return;
+
     game.resetGame();
     io.emit("gameStateUpdate", game.getGameState()); // broadcast to all clients
   });
 
   // Handle "selectCard" event
-  socket.on("selectCard", ({ player, card }) => {
+  socket.on("selectCard", ({ lobbyId, player, card }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (!game) return;
+
     const success = game.selectCard(player, card);
     if (success) io.emit("gameStateUpdate", game.getGameState());
   });
 
   // Handle "playCard" event
-  socket.on("playCard", (pos) => {
-    const valid = game.isValidMove(pos);
-    if (valid && game.playCard(pos)) {
-      io.emit("gameStateUpdate", game.getGameState());
+  socket.on("playCard", ({ lobbyId, pos }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (!game) return;
+
+    const success = game.applyMove(pos);
+
+    if (success) {
+      if (lobbyId) {
+        // multiplayer
+        io.to(lobbyId).emit("gameStateUpdate", game.getGameState());
+      } else {
+        // local
+        socket.emit("gameStateUpdate", game.getGameState());
+      }
     } else {
       socket.emit("invalidMove");
     }
   });
 
   // Example: next round
-  socket.on("nextRound", () => {
+  socket.on("nextRound", ({ lobbyId }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (!game) return;
+
     game.nextRound();
     io.emit("gameStateUpdate", game.getGameState());
   });
 
-  socket.on("selectDealer", (winningPlayer) => {
+  socket.on("selectDealer", ({ lobbyId, winningPlayer }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (!game) return;
+
     game.selectDealer(winningPlayer);
     io.emit("gameStateUpdate", game.getGameState());
   });
 
-  socket.on("discardToCrib", ({ numPlayers, player, card }) => {
+  socket.on("discardToCrib", ({ lobbyId, numPlayers, player, card }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (!game) return;
     const success = game.discardToCrib(numPlayers, player, card);
     if (success) {
       io.emit("gameStateUpdate", game.getGameState());
     }
   });
-
-  // Listen for a test message from the client
-  // socket.on("sendMessage", (data) => {
-  //   console.log(`Received message from ${socket.id}: ${data}`);
-  //   // Update the game state with the received message
-  //   gameState.message = `Player ${socket.id} says: ${data}`;
-  //   // Broadcast the updated state to all connected clients
-  //   io.emit("gameStateUpdate", gameState);
-  // });
 
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
