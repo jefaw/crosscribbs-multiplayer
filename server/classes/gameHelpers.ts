@@ -2,7 +2,19 @@
 
 import type GameController from "server/gameController";
 
-// Export games map so all handlers can share it
+interface Player {
+  id: string;
+  name: string;
+}
+
+interface Lobby {
+  players: Player[];
+  host: string;
+  numPlayers: number;
+}
+
+// Export lobbies and games maps so all handlers can share it
+export const lobbies: Record<string, Lobby> = {}; // { lobbyId: { players: [], host: socketId }}
 export const games: Record<string, GameController> = {};
 
 /**

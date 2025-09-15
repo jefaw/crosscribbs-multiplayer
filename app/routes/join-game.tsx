@@ -1,32 +1,23 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "~/connections/socket";
+import { useLobby } from "~/hooks/useLobby";
 
 export default function JoinGame() {
   const navigate = useNavigate();
-  const [gameIdInput, setGameIdInput] = useState<string>("");
+  const { joinLobby } = useLobby();
+  const [username, setUsername] = useState("");
+  const [lobbyId, setLobbyId] = useState("");
   const [joinError, setJoinError] = useState<string | null>(null);
 
-  useEffect(() => {
-    socket.on("playerJoined", ({ gameId, players }) => {
-      console.log("Joined game:", gameId);
-      navigate(`/lobby/${gameId}`, { state: { gameId, players } });
-    });
-
-    socket.on("joinGameFailed", (message) => {
-      setJoinError(message);
-    });
-
-    return () => {
-      socket.off("playerJoined");
-      socket.off("joinGameFailed");
-    };
-  }, [navigate]);
-
-  const handleJoinGame = () => {
-    setJoinError(null); // Clear previous errors
-    if (gameIdInput.trim()) {
-      socket.emit("joinGame", { gameId: gameIdInput.trim() });
+  const handleJoinGame = async () => {
+    try {
+      await joinLobby(lobbyId, username);
+      navigate("/lobby", {
+        state: { lobbyId },
+      });
+    } catch (err: any) {
+      alert(err);
     }
   };
 
@@ -41,16 +32,31 @@ export default function JoinGame() {
         <h2 className="text-2xl font-bold text-white mb-6">Join Game</h2>
 
         <div className="mb-4">
+          <label htmlFor="username" className="block text-white text-lg font-bold mb-2">
+            Username:
+          </label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full p-2 rounded bg-slate-600 text-white"
+            placeholder="i.e BillyTheKid"
+          />
+          {joinError && <p className="text-red-400 text-sm mt-2">{joinError}</p>}
+        </div>
+
+        <div className="mb-4">
           <label htmlFor="gameId" className="block text-white text-lg font-bold mb-2">
             Enter Game ID:
           </label>
           <input
             type="text"
-            id="gameId"
-            value={gameIdInput}
-            onChange={(e) => setGameIdInput(e.target.value.toUpperCase())}
+            id="lobbyId"
+            value={lobbyId}
+            onChange={(e) => setLobbyId(e.target.value)}
             className="w-full p-2 rounded bg-slate-600 text-white"
-            placeholder="e.g., ABCDEFG"
+            placeholder="i.e 2"
           />
           {joinError && <p className="text-red-400 text-sm mt-2">{joinError}</p>}
         </div>

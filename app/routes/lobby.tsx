@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { socket } from "~/connections/socket";
+import { useLobby } from "~/hooks/useLobby";
 
 interface PlayerInfo {
   id: string;
@@ -8,54 +9,46 @@ interface PlayerInfo {
 }
 
 export default function Lobby() {
-  const { gameId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const lobbyId = location.state?.lobbyId;
+  const { lobby, gameStarted, startGame } = useLobby(lobbyId);
   const [players, setPlayers] = useState<PlayerInfo[]>(location.state?.players || []);
   const [hostId, setHostId] = useState<string>(location.state?.hostId || "");
   const [maxPlayers, setMaxPlayers] = useState<number>(location.state?.maxPlayers || 0);
   const [gameMode, setGameMode] = useState<string>(location.state?.gameMode || "");
 
+  // const isHost = lobby.host === lobby.players.find(p => p.id === lobbyId)?.id;
   const isHost = socket.id === hostId;
   const canStartGame = players.length === maxPlayers && isHost;
 
   useEffect(() => {
-    if (!gameId) {
+    if (!lobbyId) {
+      console.log("LOBBY: lobby id = ", lobbyId);
       navigate("/multiplayer-setup");
-      return;
     }
-
-    socket.on("playerJoined", ({ playerId, players: updatedPlayers }) => {
-      console.log(`Player ${playerId} joined the lobby.`);
-      setPlayers(updatedPlayers);
-    });
-
-    socket.on("playerLeft", ({ playerId, players: updatedPlayers }) => {
-      console.log(`Player ${playerId} left the lobby.`);
-      setPlayers(updatedPlayers);
-    });
 
     socket.on("gameStateUpdate", (gameState) => {
       // This means the game has started
       console.log("Game started, navigating to game page.", gameState);
-      navigate(`/game/${gameId}`, { state: { gameId, gameState } });
+      navigate(`/game/${lobbyId}`, { state: { lobbyId, gameState } });
     });
 
     // If navigating directly to lobby, try to get game info
-    if (players.length === 0 && gameId) {
-      socket.emit("getLobbyInfo", { gameId });
+    if (players.length === 0 && lobbyId) {
+      socket.emit("getLobbyInfo", { lobbyId });
     }
 
     return () => {
-      socket.off("playerJoined");
-      socket.off("playerLeft");
       socket.off("gameStateUpdate");
     };
-  }, [gameId, navigate, players.length]);
+  }, [lobbyId, navigate, players.length]);
+
+  if (!lobby) return <div>Loading lobby...</div>;
 
   const handleStartGame = () => {
     if (canStartGame) {
-      socket.emit("startGame", { gameId });
+      socket.emit("startGame", { lobbyId });
     }
   };
 
@@ -69,11 +62,22 @@ export default function Lobby() {
       <div className="bg-slate-700 p-8 rounded-lg shadow-xl w-[400px]">
         <h2 className="text-2xl font-bold text-white mb-6">Game Lobby</h2>
         <p className="text-white text-lg mb-4">
-          Game ID: <span className="font-bold text-cyan-300">{gameId}</span>
+          Lobby ID: <span className="font-bold text-cyan-300">{lobbyId}</span>
         </p>
-        <p className="text-white text-lg mb-4">
+        <h2>Players:</h2>
+        <ul>
+          {lobby.players.map((player: any) => (
+            <li key={player.id}>
+              {player.name} {lobby.host === player.id ? "(Host)" : ""}
+            </li>
+          ))}
+        </ul>
+        <p>
+          {lobby.players.length}/{lobby.numPlayers} players
+        </p>
+        {/* <p className="text-white text-lg mb-4">
           Game Mode: <span className="font-bold text-cyan-300">{gameMode}</span>
-        </p>
+        </p> */}
         <p className="text-white text-lg mb-4">
           Players: {players.length} / {maxPlayers}
         </p>

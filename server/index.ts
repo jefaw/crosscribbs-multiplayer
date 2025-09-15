@@ -7,17 +7,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import GameController from "./gameController";
-import { getGame, games, deleteGame } from "./classes/gameHelpers";
-
-interface Player {
-  id: string;
-  name: string;
-}
-
-interface Lobby {
-  players: Player[];
-  host: string;
-}
+import { getGame, lobbies, games, deleteGame } from "./classes/gameHelpers";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,52 +30,45 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 4000;
 
-// // Game testing interface route
-// app.get("/test-game", (req, res) => {
-//   res.sendFile(path.join(__dirname, "game-test-interface.html"));
-// });
-
-// Game state route for testing
-app.get("/api/game/state", (req, res) => {
-  // This would normally return the actual game state
-  // For now, return a mock state
-  res.json({
-    status: "OK",
-    message: "Game state endpoint working",
-  });
-});
-
-// Simple game state for testing
-const gameState = {
-  message: "Waiting for players...",
-};
+let lobbyCounter = 1;
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  const lobbies: Record<string, Lobby> = {}; // { lobbyId: { players: [], host: socketId }}
-  const games: Record<string, GameController> = {};
-  let lobbyCounter = 1;
-
   // Create Lobby
-  socket.on("createLobby", (username, callback) => {
+  socket.on("createLobby", (username, numPlayers, callback) => {
+    console.log("test create lobby");
     const lobbyId = String(lobbyCounter++);
-    lobbies[lobbyId] = { players: [{ id: socket.id, name: username }], host: socket.id };
+    lobbies[lobbyId] = {
+      players: [{ id: socket.id, name: username }],
+      host: socket.id,
+      numPlayers,
+    };
     socket.join(lobbyId);
     callback({ lobbyId });
+    console.log(`lobby created: lobby id: ${lobbyId}`);
     io.to(lobbyId).emit("lobbyUpdate", lobbies[lobbyId]);
   });
 
   // Join Lobby
   socket.on("joinLobby", (lobbyId, username, callback) => {
-    if (!lobbies[lobbyId]) {
-      callback({ error: "Lobby not found" });
-      return;
-    }
-    lobbies[lobbyId].players.push({ id: socket.id, name: username });
+    console.log("join lobby id: ", lobbyId);
+    console.log("all lobbies = ", lobbies);
+    const lobby = lobbies[lobbyId];
+
+    if (!lobby) return callback({ error: "Lobby not found" });
+    if (lobby.players.length >= lobby.numPlayers) return callback({ error: "Lobby full" });
+
+    lobby.players.push({ id: socket.id, name: username });
     socket.join(lobbyId);
     callback({ lobbyId });
-    io.to(lobbyId).emit("lobbyUpdate", lobbies[lobbyId]);
+    io.to(lobbyId).emit("lobbyUpdate", lobby);
+  });
+
+  socket.on("getLobbyInfo", ({ lobbyId }, callback) => {
+    const lobby = lobbies[lobbyId];
+    if (!lobby) return callback({ error: "Lobby not found" });
+    callback({ lobby });
   });
 
   socket.on("startGame", ({ numPlayers, lobbyId }) => {

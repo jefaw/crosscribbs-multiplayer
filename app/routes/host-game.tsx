@@ -1,25 +1,31 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { socket } from "~/connections/socket";
+import { useLobby } from "~/hooks/useLobby";
 
 export default function HostGame() {
   const navigate = useNavigate();
+  const { createLobby } = useLobby();
+  const [username, setUsername] = useState("");
   const [maxPlayers, setMaxPlayers] = useState<2 | 4>(2);
   const [gameMode, setGameMode] = useState<string>("standard"); // Default game mode
 
-  useEffect(() => {
-    socket.on("gameHosted", ({ gameId, hostId, players, maxPlayers, gameMode }) => {
-      console.log("Game Hosted:", gameId);
-      navigate(`/lobby/${gameId}`, { state: { gameId, hostId, players, maxPlayers, gameMode } });
-    });
-
-    return () => {
-      socket.off("gameHosted");
-    };
-  }, [navigate]);
-
-  const handleHostGame = () => {
-    socket.emit("hostGame", { maxPlayers, gameMode });
+  const handleHostGame = async () => {
+    console.log("username: ", username);
+    if (!username) {
+      alert("Username cannot be empty");
+      return;
+    }
+    try {
+      const { lobbyId } = await createLobby(username, maxPlayers);
+      console.log("HOST GAME: lobby id = ", lobbyId);
+      navigate("/lobby", {
+        state: { lobbyId },
+      });
+    } catch (err: any) {
+      console.log("error");
+      alert(err);
+    }
+    // socket.emit("startGame", { lobbyId, maxPlayers, gameMode });
   };
 
   return (
@@ -31,6 +37,18 @@ export default function HostGame() {
       </div>
       <div className="bg-slate-700 p-8 rounded-lg shadow-xl w-[400px]">
         <h2 className="text-2xl font-bold text-white mb-6">Host Game</h2>
+
+        <div className="mb-4">
+          <label htmlFor="username" className="block text-white text-lg font-bold mb-2">
+            Username:
+          </label>
+          <input
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full p-2 rounded bg-slate-600 text-white"
+          ></input>
+        </div>
 
         <div className="mb-4">
           <label htmlFor="maxPlayers" className="block text-white text-lg font-bold mb-2">
