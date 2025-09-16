@@ -96,8 +96,8 @@ export default function Game() {
 
   return (
     <div className="bg-green-600">
-      <div className="flex flex-col xl:flex-row relative">
-        <div className="w-full xl:w-1/4 h-screen">
+      <div className="flex flex-col xl:flex-row relative h-screen items-center">
+        <div className="w-full xl:w-1/4">
           <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
               <button
@@ -142,7 +142,7 @@ export default function Game() {
             />
           )}
         </div>
-        <div className="w-full xl:w-1/2 flex items-center justify-center">
+        <div className="w-full xl:w-1/2">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
         </div>
         <div className="w-full xl:w-1/4">
