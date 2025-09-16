@@ -71,6 +71,7 @@ export default class GameController implements GameStateType {
       if (players[1]) this.player2.id = players[1].id;
       if (players[2]) this.player3.id = players[2].id;
       if (players[3]) this.player4.id = players[3].id;
+      this.numPlayers = lobby.numPlayers; // set multiplayer numPlayers
     }
 
     // Initialize the game
