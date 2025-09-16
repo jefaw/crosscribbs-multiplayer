@@ -1,3 +1,4 @@
+import type { Lobby } from "server/classes/gameHelpers";
 import type { CardType } from "./CardType";
 import type { PlayerType } from "./PlayerType";
 import type { ScoreType } from "./ScoreType";
@@ -20,8 +21,10 @@ export interface RoundHistoryType {
 }
 
 export interface GameStateType {
+  lobby: Lobby | null;
   board: BoardType;
   turn: number;
+  turnIndex: number;
   player1: PlayerType;
   player2: PlayerType;
   player3: PlayerType;

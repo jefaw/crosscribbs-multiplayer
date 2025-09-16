@@ -6,7 +6,7 @@ interface CribProps {
 }
 
 export default function Crib({ crib, dealer }: CribProps) {
-  const backImgSrc = `cards/backs/red2.svg`;
+  const backImgSrc = `/cards/backs/red2.svg`;
   const dealerTeam = dealer ? (dealer % 2 !== 0 ? "Row" : "Column") : "";
 
   return (

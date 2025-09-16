@@ -4,9 +4,12 @@ import Player from "./classes/Player";
 import type { CardType } from "@shared/types/CardType";
 import type { ScoreType } from "@shared/types/ScoreType";
 import type { PlayerType } from "@shared/types/PlayerType";
+import type { BoardPosition } from "@shared/types/BoardTypes";
+import type { Lobby } from "./classes/gameHelpers";
 // import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 
 export default class GameController implements GameStateType {
+  lobby: Lobby | null;
   numPlayers: number;
   deck: CardType[] | null;
   board: BoardType;
@@ -15,6 +18,7 @@ export default class GameController implements GameStateType {
   player3: PlayerType;
   player4: PlayerType;
   turn: number;
+  turnIndex: number;
   selectedCard: CardType | null;
   roundScoreVisible: boolean;
   numSpotsLeft: number;
@@ -32,7 +36,8 @@ export default class GameController implements GameStateType {
   cribScore: ScoreType | null;
   heels: number; // if his heels was scored this round
 
-  constructor(numPlayers = 2) {
+  constructor(numPlayers = 2, lobby: Lobby | null = null) {
+    this.lobby = lobby;
     this.numPlayers = numPlayers;
     this.deck = null;
     this.board = newBoard();
@@ -41,6 +46,7 @@ export default class GameController implements GameStateType {
     this.player3 = new Player("", 3, "", [], []);
     this.player4 = new Player("", 4, "", [], []);
     this.turn = 1;
+    this.turnIndex = 0;
     this.selectedCard = null;
     this.roundScoreVisible = false;
     this.numSpotsLeft = 24;
@@ -51,15 +57,31 @@ export default class GameController implements GameStateType {
     this.winner = null;
     this.roundHistory = [];
     this.currentRound = 1;
-    this.dealer = null;
+    this.dealer = 1;
     this.crib = [];
     this.dealerSelectionCards = null;
     this.dealerSelectionComplete = false;
     this.cribScore = null;
     this.heels = 0;
 
+    // if multiplayer, assign socket IDs
+    if (lobby) {
+      const players = lobby.players;
+      if (players[0]) this.player1.id = players[0].id;
+      if (players[1]) this.player2.id = players[1].id;
+      if (players[2]) this.player3.id = players[2].id;
+      if (players[3]) this.player4.id = players[3].id;
+      this.numPlayers = lobby.numPlayers; // set multiplayer numPlayers
+    }
+
     // Initialize the game
-    this.startDealerSelection();
+    // this.startDealerSelection();
+    this.initializeGame();
+  }
+
+  get currentPlayerId(): string | void {
+    if (!this.lobby) return; // local game no socket check
+    return this.lobby.players[this.turnIndex].id;
   }
 
   getPlayer(playerNumber: number): PlayerType {
@@ -87,6 +109,15 @@ export default class GameController implements GameStateType {
     }
   }
 
+  applyMove(move: BoardPosition, playerId?: string): boolean {
+    const valid = this.isValidMove(move);
+    if (valid && this.playCard(move, playerId)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   startDealerSelection(): void {
     this.deck = newDeck();
     this.dealerSelectionCards = this.deck.slice(0, this.numPlayers);
@@ -105,8 +136,7 @@ export default class GameController implements GameStateType {
     // His Heels for center jack which gives 2 points to dealer at the end of the round
     if (this.deck[0].name === "jack") {
       this.heels = 2;
-    }
-    else{
+    } else {
       this.heels = 0;
     }
 
@@ -120,6 +150,8 @@ export default class GameController implements GameStateType {
       this.player4.hand = this.deck?.slice(22, 29) || []; // 7 cards
     }
 
+    this.crib = [];
+
     this.player1.discardedToCrib = [];
     this.player2.discardedToCrib = [];
     this.player3.discardedToCrib = [];
@@ -128,26 +160,21 @@ export default class GameController implements GameStateType {
     this.selectedCard = this.player1.hand[this.player1.hand.length - 1];
   }
 
-  selectCard(player: number, card: CardType): boolean {
-    if (player !== this.turn) return false;
+  selectCard(playerId: string, card: CardType): boolean {
+    if (playerId !== this.currentPlayerId) return false;
     this.selectedCard = card;
     return true;
   }
 
-  playCard(pos: [number, number]): boolean {
+  playCard(pos: [number, number], playerId?: string): boolean {
     if (!this.selectedCard) return false;
+    if (this.lobby && playerId !== this.currentPlayerId) return false; // if multi ensure matching playerId for correct turn id
+
     const [r, c] = pos;
     this.board[r][c] = this.selectedCard;
 
-    if (this.turn === 1) {
-      this.player1.hand.pop();
-    } else if (this.turn === 2) {
-      this.player2.hand.pop();
-    } else if (this.turn === 3) {
-      this.player3.hand.pop();
-    } else if (this.turn === 4) {
-      this.player4.hand.pop();
-    }
+    const player = this.getPlayer(this.turn);
+    player.hand.pop();
 
     this.selectedCard = null;
     this.numSpotsLeft--;
@@ -156,8 +183,9 @@ export default class GameController implements GameStateType {
     return true;
   }
 
-  discardToCrib(numPlayers: number, player: PlayerType, card: CardType): boolean {
+  discardToCrib(numPlayers: number, player: PlayerType, card: CardType, playerId?: string): boolean {
     if (player.num !== this.turn) return false;
+    if (this.lobby && playerId !== this.currentPlayerId) return false; // if multi ensure matching playerId for correct turn id
 
     if (numPlayers === 2 && player.discardedToCrib.length >= 2) {
       return false;
@@ -233,6 +261,7 @@ export default class GameController implements GameStateType {
       return;
     }
     this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
+    this.turnIndex = this.turnIndex >= this.numPlayers - 1 ? 0 : this.turnIndex + 1;
     const player = this.getPlayer(this.turn);
     if (!player.hand.length && !this.forcedToDiscardToCrib(player)) {
       this.nextTurn(); // if hand is empty then switch to next turn
@@ -301,6 +330,7 @@ export default class GameController implements GameStateType {
   }
 
   nextRound(): boolean {
+    console.log("next round");
     if (this.gameOver) return false;
     this.board = newBoard();
     this.roundScoreVisible = false;
@@ -313,6 +343,7 @@ export default class GameController implements GameStateType {
       this.dealer = this.dealer >= this.numPlayers ? 1 : this.dealer + 1;
     }
     this.initializeGame();
+    console.log("nr = true");
     return true;
   }
 
@@ -327,13 +358,16 @@ export default class GameController implements GameStateType {
     this.deck = newDeck();
     this.roundHistory = [];
     this.currentRound = 1;
+    this.dealer = 1;
     this.initializeGame();
   }
 
   getGameState(): GameStateType {
     return {
+      lobby: this.lobby,
       board: this.board,
       turn: this.turn,
+      turnIndex: this.turnIndex,
       player1: this.player1,
       player2: this.player2,
       player3: this.player3,

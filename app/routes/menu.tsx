@@ -3,6 +3,7 @@ import LocalOrOnline from "~/ui/GameSetup/LocalOrOnline";
 import NumPlayers from "~/ui/GameSetup/NumPlayers";
 import PlayerSetup from "~/ui/GameSetup/PlayerSetup";
 import { useNavigate } from "react-router-dom";
+import { socket } from "~/connections/socket";
 
 type SetupPage = "gameType" | "numPlayers" | "playerSetup";
 const pageOrder: SetupPage[] = ["gameType", "numPlayers", "playerSetup"];
@@ -20,6 +21,9 @@ export default function GameSetup() {
     if (currentIndex > 0) {
       setCurrentPage(pageOrder[currentIndex - 1]);
     }
+  };
+  const setLocalSettings = () => {
+    socket.emit("setLocalSettings", gameType, numPlayers, playerNames);
   };
 
   return (

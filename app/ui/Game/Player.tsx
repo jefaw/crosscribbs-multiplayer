@@ -15,15 +15,17 @@ type ChildProps = {
   turn: number;
   crib: CardType[];
   numPlayers: number;
+  lobbyId: string | undefined;
+  playerId: string | undefined;
 };
 
-export default function Player({ name, player, turn, crib, numPlayers }: ChildProps) {
+export default function Player({ name, player, turn, lobbyId, numPlayers, playerId }: ChildProps) {
   const { hand, discardedToCrib } = player;
   // hand = props.hand
 
   //Get top card
   const card = hand.length > 0 ? hand[hand.length - 1] : false;
-  const backImgSrc = `cards/backs/red2.svg`; // can be changed in future
+  const backImgSrc = `/cards/backs/red2.svg`; // can be changed in future
 
   function handleDragStart(e: any) {
     e.dataTransfer.effectAllowed = "move"; // don't show plus icon on drag
@@ -31,7 +33,7 @@ export default function Player({ name, player, turn, crib, numPlayers }: ChildPr
 
   function handleDiscard() {
     if (card) {
-      socket.emit("discardToCrib", { numPlayers, player, card });
+      socket.emit("discardToCrib", { lobbyId, numPlayers, player, playerId, card });
     }
   }
 
@@ -82,7 +84,14 @@ export default function Player({ name, player, turn, crib, numPlayers }: ChildPr
       <div
         className={`flex flex-col justify-center ${bgGradient} m-8 py-4 px-4 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
       >
-        <h1 className="text-center text-xl font-bold mb-3 text-gray-800">{name}</h1>
+        <div className="flex items-center justify-center mb-3">
+          <h1 className="text-xl font-bold text-gray-800">{name}</h1>
+          {lobbyId && playerId === player.id && (
+            <span className="bg-green-400 text-black px-2 rounded-full text-xs ml-2 italic">You</span>
+          )}
+        </div>
+        {/* <h1 className="text-center text-xl font-bold mb-3 text-gray-800">{name}</h1>
+        {playerId === player.id && <span className="bg-green-400 text-black px-2 rounded-full text-xs ml-2">You</span>} */}
         {card ? displayCard : noCard}
       </div>
     </>
