@@ -74,11 +74,10 @@ io.on("connection", (socket) => {
   socket.on("startGame", ({ lobbyId, numPlayers }) => {
     if (lobbyId) {
       // Multiplayer game tied to a lobby
-      games[lobbyId] = new GameController(numPlayers);
+      const lobby = lobbies[lobbyId];
+      games[lobbyId] = new GameController(numPlayers, lobby);
       const newGame = getGame(socket.id, lobbyId);
       if (!newGame) return;
-      const lobby = lobbies[lobbyId];
-      newGame.lobby = lobby;
       io.to(lobbyId).emit("gameStateUpdate", games[lobbyId].getGameState());
       console.log(`Multiplayer game started in lobby ${lobbyId}`);
     } else {
@@ -109,11 +108,11 @@ io.on("connection", (socket) => {
   // });
 
   // Handle "playCard" event
-  socket.on("playCard", ({ lobbyId, player, pos }) => {
+  socket.on("playCard", ({ lobbyId, playerId, pos }) => {
     const game = getGame(socket.id, lobbyId);
     if (!game) return;
 
-    const success = game.applyMove(pos);
+    const success = game.applyMove(pos, playerId);
 
     if (success) {
       if (lobbyId) {
@@ -153,10 +152,10 @@ io.on("connection", (socket) => {
     io.emit("gameStateUpdate", game.getGameState());
   });
 
-  socket.on("discardToCrib", ({ lobbyId, numPlayers, player, card }) => {
+  socket.on("discardToCrib", ({ lobbyId, numPlayers, player, card, playerId }) => {
     const game = getGame(socket.id, lobbyId);
     if (!game) return;
-    const success = game.discardToCrib(numPlayers, player, card);
+    const success = game.discardToCrib(numPlayers, player, card, playerId);
     if (success) {
       io.emit("gameStateUpdate", game.getGameState());
     }

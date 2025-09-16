@@ -78,7 +78,8 @@ export default function Game() {
 
   const playCard = (pos: BoardPosition) => {
     if (isMultiplayer) {
-      socket.emit("playCard", { lobbyId, pos });
+      const playerId = socket.id;
+      socket.emit("playCard", { lobbyId, pos, playerId });
     } else {
       socket.emit("playCard", { pos });
     }
@@ -96,7 +97,7 @@ export default function Game() {
   return (
     <div className="bg-green-600">
       <div className="flex flex-col xl:flex-row relative">
-        <div className="w-full xl:w-1/4">
+        <div className="w-full xl:w-1/4 h-screen">
           <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
               <button
@@ -115,6 +116,8 @@ export default function Game() {
                 turn={gameState.turn}
                 crib={gameState.crib}
                 numPlayers={numPlayers}
+                lobbyId={lobbyId}
+                playerId={socket.id}
               />
               <Player
                 name={playerNames[2]}
@@ -122,6 +125,8 @@ export default function Game() {
                 turn={gameState.turn}
                 crib={gameState.crib}
                 numPlayers={numPlayers}
+                lobbyId={lobbyId}
+                playerId={socket.id}
               />
             </>
           )}
@@ -132,10 +137,12 @@ export default function Game() {
               turn={gameState.turn}
               crib={gameState.crib}
               numPlayers={numPlayers}
+              lobbyId={lobbyId}
+              playerId={socket.id}
             />
           )}
         </div>
-        <div className="w-full xl:w-1/2">
+        <div className="w-full xl:w-1/2 flex items-center justify-center">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
         </div>
         <div className="w-full xl:w-1/4">
@@ -147,6 +154,8 @@ export default function Game() {
                 turn={gameState.turn}
                 crib={gameState.crib}
                 numPlayers={numPlayers}
+                lobbyId={lobbyId}
+                playerId={socket.id}
               />
               <Player
                 name={playerNames[3]}
@@ -154,6 +163,8 @@ export default function Game() {
                 turn={gameState.turn}
                 crib={gameState.crib}
                 numPlayers={numPlayers}
+                lobbyId={lobbyId}
+                playerId={socket.id}
               />
             </>
           )}
@@ -164,6 +175,8 @@ export default function Game() {
               turn={gameState.turn}
               crib={gameState.crib}
               numPlayers={numPlayers}
+              lobbyId={lobbyId}
+              playerId={socket.id}
             />
           )}
         </div>
