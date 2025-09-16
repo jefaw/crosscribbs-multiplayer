@@ -6,14 +6,8 @@ type ChildProps = {
   onBack: () => void;
 };
 
-export default function PlayerSetup({
-  numPlayers,
-  onSetPlayerNames,
-  onBack,
-}: ChildProps) {
-  const [playerNames, setPlayerNames] = useState<
-    String[]
-  >(() => Array.from({ length: numPlayers }, () => ""));
+export default function PlayerSetup({ numPlayers, onSetPlayerNames, onBack }: ChildProps) {
+  const [playerNames, setPlayerNames] = useState<String[]>(() => Array.from({ length: numPlayers }, () => ""));
 
   const handleNameChange = (index: number, name: string) => {
     const newPlayerNames = [...playerNames];
@@ -29,10 +23,7 @@ export default function PlayerSetup({
       <div className="space-y-4">
         {playerNames.map((name, index) => (
           <div key={index}>
-            <label
-              className="block text-white text-sm font-bold mb-2"
-              htmlFor={`player${index + 1}`}
-            >
+            <label className="block text-white text-sm font-bold mb-2" htmlFor={`player${index + 1}`}>
               Player {index + 1} Name
             </label>
             <input

@@ -13,14 +13,6 @@ export default function Lobby() {
   const navigate = useNavigate();
   const lobbyId = location.state?.lobbyId;
   const { lobby, gameStarted, startGame } = useLobby(lobbyId);
-  const [players, setPlayers] = useState<PlayerInfo[]>(location.state?.players || []);
-  const [hostId, setHostId] = useState<string>(location.state?.hostId || "");
-  const [maxPlayers, setMaxPlayers] = useState<number>(location.state?.maxPlayers || 0);
-  const [gameMode, setGameMode] = useState<string>(location.state?.gameMode || "");
-
-  // const isHost = lobby.host === lobby.players.find(p => p.id === lobbyId)?.id;
-  const isHost = socket.id === hostId;
-  const canStartGame = players.length === maxPlayers && isHost;
 
   useEffect(() => {
     if (!lobbyId) {
@@ -34,21 +26,23 @@ export default function Lobby() {
       navigate(`/game/${lobbyId}`, { state: { lobbyId, gameState } });
     });
 
-    // If navigating directly to lobby, try to get game info
-    if (players.length === 0 && lobbyId) {
-      socket.emit("getLobbyInfo", { lobbyId });
-    }
-
     return () => {
       socket.off("gameStateUpdate");
     };
-  }, [lobbyId, navigate, players.length]);
+  }, [lobbyId, navigate]);
 
   if (!lobby) return <div>Loading lobby...</div>;
 
+  const myId = socket.id;
+  const numPlayers = lobby.numPlayers;
+  const isHost = lobby.host === myId;
+  const canStartGame = lobby.players.length === numPlayers && isHost;
+
+  console.log(`lobby.players.len = ${lobby.players.length} === lobby.numPlayers = ${lobby.numPlayers}`);
+
   const handleStartGame = () => {
     if (canStartGame) {
-      socket.emit("startGame", { lobbyId });
+      socket.emit("startGame", { lobbyId, numPlayers });
     }
   };
 
@@ -64,32 +58,28 @@ export default function Lobby() {
         <p className="text-white text-lg mb-4">
           Lobby ID: <span className="font-bold text-cyan-300">{lobbyId}</span>
         </p>
-        <h2>Players:</h2>
-        <ul>
-          {lobby.players.map((player: any) => (
-            <li key={player.id}>
-              {player.name} {lobby.host === player.id ? "(Host)" : ""}
-            </li>
-          ))}
-        </ul>
-        <p>
-          {lobby.players.length}/{lobby.numPlayers} players
-        </p>
         {/* <p className="text-white text-lg mb-4">
           Game Mode: <span className="font-bold text-cyan-300">{gameMode}</span>
         </p> */}
         <p className="text-white text-lg mb-4">
-          Players: {players.length} / {maxPlayers}
+          Players: {lobby.players.length} / {lobby.numPlayers}
         </p>
         <ul className="list-disc list-inside text-white mb-6">
-          {players.map((player) => (
+          {lobby.players.map((player: any) => (
             <li key={player.id}>
-              {player.name} {player.id === hostId && "(Host)"}
+              {/* {player.name} {lobby.host === player.id ? "(Host)" : ""} */}
+              {player.name}
+              {player.id === lobby.host && (
+                <span className="bg-yellow-400 text-black px-2 rounded-full text-xs ml-2">Host</span>
+              )}
+              {player.id === myId && (
+                <span className="bg-green-400 text-black px-2 rounded-full text-xs ml-2">You</span>
+              )}
             </li>
           ))}
         </ul>
 
-        {isHost && (
+        {lobby.host && (
           <button
             onClick={handleStartGame}
             disabled={!canStartGame}

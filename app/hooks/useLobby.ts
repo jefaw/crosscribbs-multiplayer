@@ -26,6 +26,7 @@ export function useLobby(lobbyId?: string) {
 
   const createLobby = (username: string, numPlayers: number) =>
     new Promise<{ lobbyId: string }>((resolve, reject) => {
+      console.log("usecribbs create lobby");
       socket.emit("createLobby", username, numPlayers, (res: any) => {
         if (res.error) reject(res.error);
         else resolve(res);

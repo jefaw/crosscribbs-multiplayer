@@ -71,10 +71,14 @@ io.on("connection", (socket) => {
     callback({ lobby });
   });
 
-  socket.on("startGame", ({ numPlayers, lobbyId }) => {
+  socket.on("startGame", ({ lobbyId, numPlayers }) => {
     if (lobbyId) {
       // Multiplayer game tied to a lobby
       games[lobbyId] = new GameController(numPlayers);
+      const newGame = getGame(socket.id, lobbyId);
+      if (!newGame) return;
+      const lobby = lobbies[lobbyId];
+      newGame.lobby = lobby;
       io.to(lobbyId).emit("gameStateUpdate", games[lobbyId].getGameState());
       console.log(`Multiplayer game started in lobby ${lobbyId}`);
     } else {
@@ -96,16 +100,16 @@ io.on("connection", (socket) => {
   });
 
   // Handle "selectCard" event
-  socket.on("selectCard", ({ lobbyId, player, card }) => {
-    const game = getGame(socket.id, lobbyId);
-    if (!game) return;
+  // socket.on("selectCard", ({ lobbyId, player, card }) => {
+  //   const game = getGame(socket.id, lobbyId);
+  //   if (!game) return;
 
-    const success = game.selectCard(player, card);
-    if (success) io.emit("gameStateUpdate", game.getGameState());
-  });
+  //   const success = game.selectCard(player, card);
+  //   if (success) io.emit("gameStateUpdate", game.getGameState());
+  // });
 
   // Handle "playCard" event
-  socket.on("playCard", ({ lobbyId, pos }) => {
+  socket.on("playCard", ({ lobbyId, player, pos }) => {
     const game = getGame(socket.id, lobbyId);
     if (!game) return;
 
@@ -125,12 +129,20 @@ io.on("connection", (socket) => {
   });
 
   // Example: next round
-  socket.on("nextRound", ({ lobbyId }) => {
+  socket.on("nextRound", (data = {}) => {
+    const { lobbyId } = data;
     const game = getGame(socket.id, lobbyId);
     if (!game) return;
 
     game.nextRound();
-    io.emit("gameStateUpdate", game.getGameState());
+
+    if (lobbyId) {
+      // multiplayer
+      io.emit("gameStateUpdate", game.getGameState());
+    } else {
+      // local
+      socket.emit("gameStateUpdate", game.getGameState());
+    }
   });
 
   socket.on("selectDealer", ({ lobbyId, winningPlayer }) => {

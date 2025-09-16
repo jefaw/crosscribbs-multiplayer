@@ -7,7 +7,7 @@ interface Player {
   name: string;
 }
 
-interface Lobby {
+export interface Lobby {
   players: Player[];
   host: string;
   numPlayers: number;

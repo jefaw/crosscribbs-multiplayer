@@ -5,9 +5,11 @@ import type { CardType } from "@shared/types/CardType";
 import type { ScoreType } from "@shared/types/ScoreType";
 import type { PlayerType } from "@shared/types/PlayerType";
 import type { BoardPosition } from "@shared/types/BoardTypes";
+import type { Lobby } from "./classes/gameHelpers";
 // import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 
 export default class GameController implements GameStateType {
+  lobby: Lobby | null;
   numPlayers: number;
   deck: CardType[] | null;
   board: BoardType;
@@ -16,6 +18,7 @@ export default class GameController implements GameStateType {
   player3: PlayerType;
   player4: PlayerType;
   turn: number;
+  turnIndex: number;
   selectedCard: CardType | null;
   roundScoreVisible: boolean;
   numSpotsLeft: number;
@@ -34,6 +37,7 @@ export default class GameController implements GameStateType {
   heels: number; // if his heels was scored this round
 
   constructor(numPlayers = 2) {
+    this.lobby = null;
     this.numPlayers = numPlayers;
     this.deck = null;
     this.board = newBoard();
@@ -42,6 +46,7 @@ export default class GameController implements GameStateType {
     this.player3 = new Player("", 3, "", [], []);
     this.player4 = new Player("", 4, "", [], []);
     this.turn = 1;
+    this.turnIndex = 0;
     this.selectedCard = null;
     this.roundScoreVisible = false;
     this.numSpotsLeft = 24;
@@ -52,7 +57,7 @@ export default class GameController implements GameStateType {
     this.winner = null;
     this.roundHistory = [];
     this.currentRound = 1;
-    this.dealer = null;
+    this.dealer = 1;
     this.crib = [];
     this.dealerSelectionCards = null;
     this.dealerSelectionComplete = false;
@@ -60,7 +65,13 @@ export default class GameController implements GameStateType {
     this.heels = 0;
 
     // Initialize the game
-    this.startDealerSelection();
+    // this.startDealerSelection();
+    this.initializeGame();
+  }
+
+  get currentPlayerId(): string | void {
+    if (!this.lobby) return;
+    return this.lobby.players[this.turnIndex].id;
   }
 
   getPlayer(playerNumber: number): PlayerType {
@@ -129,6 +140,8 @@ export default class GameController implements GameStateType {
       this.player4.hand = this.deck?.slice(22, 29) || []; // 7 cards
     }
 
+    this.crib = [];
+
     this.player1.discardedToCrib = [];
     this.player2.discardedToCrib = [];
     this.player3.discardedToCrib = [];
@@ -137,14 +150,15 @@ export default class GameController implements GameStateType {
     this.selectedCard = this.player1.hand[this.player1.hand.length - 1];
   }
 
-  selectCard(player: number, card: CardType): boolean {
-    if (player !== this.turn) return false;
+  selectCard(playerId: string, card: CardType): boolean {
+    if (playerId !== this.currentPlayerId) return false;
     this.selectedCard = card;
     return true;
   }
 
   playCard(pos: [number, number]): boolean {
     if (!this.selectedCard) return false;
+    // if (playerId !== this.currentPlayerId) return false;
     const [r, c] = pos;
     this.board[r][c] = this.selectedCard;
 
@@ -242,6 +256,7 @@ export default class GameController implements GameStateType {
       return;
     }
     this.turn = this.turn >= this.numPlayers ? 1 : this.turn + 1;
+    this.turnIndex = this.turnIndex >= this.numPlayers - 1 ? 0 : this.turnIndex + 1;
     const player = this.getPlayer(this.turn);
     if (!player.hand.length && !this.forcedToDiscardToCrib(player)) {
       this.nextTurn(); // if hand is empty then switch to next turn
@@ -310,6 +325,7 @@ export default class GameController implements GameStateType {
   }
 
   nextRound(): boolean {
+    console.log("next round");
     if (this.gameOver) return false;
     this.board = newBoard();
     this.roundScoreVisible = false;
@@ -322,6 +338,7 @@ export default class GameController implements GameStateType {
       this.dealer = this.dealer >= this.numPlayers ? 1 : this.dealer + 1;
     }
     this.initializeGame();
+    console.log("nr = true");
     return true;
   }
 
@@ -336,13 +353,16 @@ export default class GameController implements GameStateType {
     this.deck = newDeck();
     this.roundHistory = [];
     this.currentRound = 1;
+    this.dealer = 1;
     this.initializeGame();
   }
 
   getGameState(): GameStateType {
     return {
+      lobby: this.lobby,
       board: this.board,
       turn: this.turn,
+      turnIndex: this.turnIndex,
       player1: this.player1,
       player2: this.player2,
       player3: this.player3,

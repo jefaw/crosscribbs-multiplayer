@@ -9,21 +9,23 @@ import { useEffect, useState } from "react";
 import type { GameStateType } from "@shared/types/GameControllerTypes";
 import type { BoardPosition } from "@shared/types/BoardTypes";
 import { socket } from "../connections/socket";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DealerSelection from "~/ui/GameSetup/DealerSelection";
 
 export default function Game() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { gameType, numPlayers, playerNames } = location.state || {};
+  const { lobbyId } = useParams();
+  let { gameType, numPlayers, playerNames } = location.state || {}; // set local settings
   const [gameState, setGameState] = useState<GameStateType | null>(null);
 
+  console.log("lobby id = ", lobbyId);
   useEffect(() => {
     console.log("location.state: ", location.state);
     // Listener functions
     const handleConnect = () => {
       console.log("Game Started");
-      socket.emit("startGame", { numPlayers });
+      socket.emit("startGame", { lobbyId, numPlayers });
     };
 
     // if the socket is already connected, call it manually
@@ -51,26 +53,44 @@ export default function Game() {
     return <div>Loading game...</div>;
   }
 
-  if (!gameState.dealerSelectionComplete) {
-    return <DealerSelection dealerSelectionCards={gameState.dealerSelectionCards} playerNames={playerNames} />;
+  let isMultiplayer = false;
+  if (gameState.lobby) {
+    numPlayers = gameState.lobby.numPlayers;
+    playerNames = gameState.lobby.players.map((p) => p.name);
+    isMultiplayer = true;
   }
 
+  console.log("playerNames = ", playerNames);
+
+  // if (!gameState.dealerSelectionComplete) {
+  //   return <DealerSelection dealerSelectionCards={gameState.dealerSelectionCards} playerNames={playerNames} />;
+  // }
+
   const handleResetGame = () => {
-    // resetGame();
+    const payload = { lobbyId: isMultiplayer ? lobbyId : undefined };
+    socket.emit("resetGame", payload);
   };
 
   const handleBackToMenu = () => {
-    // onGameOver();
-    socket.emit("resetGame");
+    handleResetGame();
     navigate("/");
   };
 
   const playCard = (pos: BoardPosition) => {
-    socket.emit("playCard", pos);
+    if (isMultiplayer) {
+      socket.emit("playCard", { lobbyId, pos });
+    } else {
+      socket.emit("playCard", { pos });
+    }
   };
 
   const nextRound = () => {
-    socket.emit("nextRound");
+    console.log("isMultiplayer = ", isMultiplayer);
+    if (isMultiplayer) {
+      socket.emit("nextRound", { lobbyId });
+    } else {
+      socket.emit("nextRound");
+    }
   };
 
   return (
