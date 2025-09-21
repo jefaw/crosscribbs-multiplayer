@@ -10,7 +10,7 @@
     "build-server": "cd server && npm run build",
     "build": "cd client && npm run build",
     "start-server": "cd server && npm run start",
-    "start": "react-router-serve ./build/server/index.js",
+    "start": "cd client && npm start",
     "typecheck": "react-router typegen && tsc"
   }
 }
