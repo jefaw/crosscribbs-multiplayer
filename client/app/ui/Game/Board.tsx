@@ -5,9 +5,9 @@
 */
 
 import Spot from "./Spot";
-import type { CardType } from "@shared/types/CardType";
-import type { BoardPosition } from "@shared/types/BoardTypes";
-import type { BoardType } from "@shared/types/GameControllerTypes";
+import type { CardType } from "@cross-cribbs/shared-types/CardType";
+import type { BoardPosition } from "@cross-cribbs/shared-types/BoardTypes";
+import type { BoardType } from "@cross-cribbs/shared-types/GameControllerTypes";
 
 type ChildProps = {
   board: BoardType;

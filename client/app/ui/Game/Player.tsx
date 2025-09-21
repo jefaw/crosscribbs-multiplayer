@@ -5,8 +5,8 @@
 - Handles card selection and drag events
 */
 
-import type { CardType } from "@shared/types/CardType";
-import type { PlayerType } from "@shared/types/PlayerType";
+import type { CardType } from "@cross-cribbs/shared-types/CardType";
+import type { PlayerType } from "@cross-cribbs/shared-types/PlayerType";
 import { socket } from "~/connections/socket";
 
 type ChildProps = {

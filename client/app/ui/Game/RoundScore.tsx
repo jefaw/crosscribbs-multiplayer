@@ -7,8 +7,8 @@
   - Winner and point difference
 */
 
-import type { BoardType } from "@shared/types/BoardTypes";
-import type { CardType } from "@shared/types/CardType";
+import type { BoardType } from "@cross-cribbs/shared-types/GameControllerTypes";
+import type { CardType } from "@cross-cribbs/shared-types/CardType";
 
 type ChildProps = {
   nextRound: () => void;
@@ -21,7 +21,16 @@ type ChildProps = {
   heels: number;
 };
 
-export default function RoundScore({ nextRound, roundScores, totalScores, cribScore, dealer, crib, board, heels }: ChildProps) {
+export default function RoundScore({
+  nextRound,
+  roundScores,
+  totalScores,
+  cribScore,
+  dealer,
+  crib,
+  board,
+  heels,
+}: ChildProps) {
   function scoreDiff() {
     let winner = roundScores[0].total > roundScores[1].total ? "Row" : "Column";
 
@@ -51,12 +60,8 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
             <h3 className="font-bold text-2xl text-cyan-400">Row</h3>
             <p className="text-xl text-cyan-400">Round Score: {rowTeamRoundScore}</p>
             <div className="text-left">
-              {dealerTeam === "Row" && cribScore && (
-                <p className="text-orange-400">{cribPoints} (crib)</p>
-              )}
-              {dealerTeam === "Row" && heels > 0 && (
-                <p className="text-orange-400">{heels} (Heels Jack)</p>
-              )}
+              {dealerTeam === "Row" && cribScore && <p className="text-orange-400">{cribPoints} (crib)</p>}
+              {dealerTeam === "Row" && heels > 0 && <p className="text-orange-400">{heels} (Heels Jack)</p>}
             </div>
             <div className="text-left">
               <p>{roundScores[0].pairs} (pairs)</p>
@@ -65,18 +70,13 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
               <p>{roundScores[0].flushes} (flushes)</p>
               <p>{roundScores[0].knobs} (knobs)</p>
             </div>
-            
           </div>
           <div>
             <h3 className="font-bold text-2xl text-fuchsia-400">Column</h3>
             <p className="text-xl text-fuchsia-400">Round Score: {colTeamRoundScore}</p>
             <div className="text-left">
-              {dealerTeam === "Column" && cribScore && (
-                <p className="text-orange-400">{cribPoints} (crib)</p>
-              )}
-              {dealerTeam === "Column" && heels > 0 && (
-                <p className="text-orange-400">{heels} (Heels - Center Jack)</p>
-              )}
+              {dealerTeam === "Column" && cribScore && <p className="text-orange-400">{cribPoints} (crib)</p>}
+              {dealerTeam === "Column" && heels > 0 && <p className="text-orange-400">{heels} (Heels - Center Jack)</p>}
             </div>
             <div className="text-left">
               <p>{roundScores[1].pairs} (pairs)</p>
@@ -85,7 +85,7 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
               <p>{roundScores[1].flushes} (flushes)</p>
               <p>{roundScores[1].knobs} (knobs)</p>
             </div>
-            </div>
+          </div>
         </div>
         {cribScore && (
           <div className="w-full flex justify-center mb-2 text-center">
@@ -93,7 +93,12 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
               <h3 className="font-bold text-2xl">Crib ({dealerTeam})</h3>
               <div className="flex justify-center space-x-1 my-2">
                 {cribHand.map((card, i) => (
-                  <img key={i} src={`/cards/fronts/${card.suit}_${card.name}.svg`} alt={`${card.name} of ${card.suit}`} className="w-16 h-auto" />
+                  <img
+                    key={i}
+                    src={`/cards/fronts/${card.suit}_${card.name}.svg`}
+                    alt={`${card.name} of ${card.suit}`}
+                    className="w-16 h-auto"
+                  />
                 ))}
               </div>
               <p className="text-2xl font-bold">{cribScore.total} points</p>
@@ -104,7 +109,7 @@ export default function RoundScore({ nextRound, roundScores, totalScores, cribSc
                 <p>{cribScore.flushes} (flushes)</p>
               </div>
             </div>
-          </div>  
+          </div>
         )}
         <div className="bg-slate-700 rounded-lg p-2 mt-2">
           <h3 className="text-center text-xl">Total Scores</h3>

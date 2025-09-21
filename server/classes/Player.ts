@@ -1,5 +1,5 @@
-import type { CardType } from "@shared/types/CardType.js";
-import type { PlayerType } from "@shared/types/PlayerType.js";
+import type { CardType } from "@cross-cribbs/shared-types/CardType.js";
+import type { PlayerType } from "@cross-cribbs/shared-types/PlayerType.js";
 
 export default class Player implements PlayerType {
   id: string;

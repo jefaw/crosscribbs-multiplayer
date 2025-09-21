@@ -1,4 +1,4 @@
-import type { CardType } from "@shared/types/CardType";
+import type { CardType } from "@cross-cribbs/shared-types/CardType";
 import { socket } from "~/connections/socket";
 
 interface DealerSelectionProps {
@@ -33,7 +33,11 @@ export default function DealerSelection({ dealerSelectionCards, playerNames }: D
           {dealerSelectionCards.map((card, i) => (
             <div key={i} className="flex flex-col items-center">
               <p className="font-bold">{playerNames[i]}</p>
-              <img src={`/cards/fronts/${card.suit}_${card.name}.svg`} alt={`${card.name} of ${card.suit}`} className="w-24 h-36" />
+              <img
+                src={`/cards/fronts/${card.suit}_${card.name}.svg`}
+                alt={`${card.name} of ${card.suit}`}
+                className="w-24 h-36"
+              />
             </div>
           ))}
         </div>

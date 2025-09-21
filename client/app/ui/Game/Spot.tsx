@@ -5,8 +5,8 @@
   - Manages card placement logic
 */
 
-import type { BoardPosition } from "@shared/types/BoardTypes";
-import type { CardType } from "@shared/types/CardType";
+import type { BoardPosition } from "@cross-cribbs/shared-types/BoardTypes";
+import type { CardType } from "@cross-cribbs/shared-types/CardType";
 
 type ChildProps = {
   pos: BoardPosition;

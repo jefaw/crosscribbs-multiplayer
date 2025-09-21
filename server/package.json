@@ -10,6 +10,7 @@
     "test": "node test-gameController.js"
   },
   "dependencies": {
+    "@cross-cribbs/shared-types": "file:../shared/types",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "socket.io": "^4.7.4"

@@ -13,6 +13,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@cross-cribbs/shared-types": "file:../shared/types",
     "@react-router/node": "^7.7.1",
     "@react-router/serve": "^7.7.1",
     "framer-motion": "^12.23.12",

@@ -1,4 +1,4 @@
-import type { CardType } from "@shared/types/CardType";
+import type { CardType } from "@cross-cribbs/shared-types/CardType";
 
 interface CribProps {
   crib: CardType[];

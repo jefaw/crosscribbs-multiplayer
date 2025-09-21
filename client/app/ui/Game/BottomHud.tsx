@@ -1,6 +1,6 @@
 import Crib from "./Crib";
 import TurnIndicator from "./TurnIndicator";
-import type { GameStateType } from "@shared/types/GameControllerTypes";
+import type { GameStateType } from "@cross-cribbs/shared-types/GameControllerTypes";
 
 interface BottomHudProps {
   gameState: GameStateType;

@@ -1,4 +1,4 @@
-import type { RoundHistoryType } from "@shared/types/GameControllerTypes";
+import type { RoundHistoryType } from "@cross-cribbs/shared-types/GameControllerTypes";
 
 type ChildProps = {
   winner: any;
