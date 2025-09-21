@@ -23,7 +23,7 @@ export default function Lobby() {
     socket.on("gameStateUpdate", (gameState) => {
       // This means the game has started
       console.log("Game started, navigating to game page.", gameState);
-      navigate(`/game/${lobbyId}`, { state: { lobbyId, gameState } });
+      navigate(`/game/${lobbyId}`, { state: { lobbyId, initialGameState: gameState } });
     });
 
     return () => {

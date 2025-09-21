@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LocalOrOnline from "~/ui/GameSetup/LocalOrOnline";
 import NumPlayers from "~/ui/GameSetup/NumPlayers";
 import PlayerSetup from "~/ui/GameSetup/PlayerSetup";
 import { useNavigate } from "react-router-dom";
 import { socket } from "~/connections/socket";
+import type { GameStateType } from "@cross-cribbs/shared-types/GameControllerTypes";
 
 type SetupPage = "gameType" | "numPlayers" | "playerSetup";
 const pageOrder: SetupPage[] = ["gameType", "numPlayers", "playerSetup"];
@@ -13,7 +14,22 @@ export default function GameSetup() {
   const [currentPage, setCurrentPage] = useState<SetupPage>("gameType");
   const [gameType, setGameType] = useState<"local" | "online" | null>(null);
   const [numPlayers, setNumPlayers] = useState<2 | 4>(2);
-  const [playerNames, setPlayerNames] = useState<String[]>([]);
+  const [playerNames, setPlayerNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    socket.on("gameStateUpdate", (gameState: GameStateType) => {
+      // This means the game has started
+      console.log("Game started, navigating to game page.", gameState);
+      console.log(
+        `gamestate = ${gameState} gameType = ${gameType} numPlayers=${numPlayers} playerNames=${playerNames}`
+      );
+      navigate("/game", { state: { initialGameState: gameState, gameType, numPlayers, playerNames } });
+    });
+
+    return () => {
+      socket.off("gameStateUpdate");
+    };
+  }, [navigate, numPlayers, playerNames]);
 
   const goToNextPage = (next: SetupPage) => setCurrentPage(next);
   const goBack = () => {
@@ -24,6 +40,15 @@ export default function GameSetup() {
   };
   const setLocalSettings = () => {
     socket.emit("setLocalSettings", gameType, numPlayers, playerNames);
+  };
+
+  const handleSetPlayerNames = (playerNames: string[]) => {
+    setPlayerNames(playerNames);
+    socket.emit("startGame", { numPlayers });
+    // console.log("player names esk = ", playerNames);
+    // navigate("/game", {
+    //   state: { gameType, numPlayers, playerNames },
+    // });
   };
 
   return (
@@ -45,6 +70,7 @@ export default function GameSetup() {
         {currentPage === "numPlayers" && (
           <NumPlayers
             onSelect={(numPlayers) => {
+              console.log("numpipiPlayers = ", numPlayers);
               setNumPlayers(numPlayers);
               goToNextPage("playerSetup");
             }}
@@ -52,16 +78,7 @@ export default function GameSetup() {
           />
         )}
         {currentPage === "playerSetup" && (
-          <PlayerSetup
-            numPlayers={numPlayers}
-            onSetPlayerNames={(playerNames) => {
-              setPlayerNames(playerNames);
-              navigate("/game", {
-                state: { gameType, numPlayers, playerNames },
-              });
-            }}
-            onBack={goBack}
-          />
+          <PlayerSetup numPlayers={numPlayers} onSetPlayerNames={handleSetPlayerNames} onBack={goBack} />
         )}
       </div>
     </div>

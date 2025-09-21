@@ -16,35 +16,38 @@ export default function Game() {
   const location = useLocation();
   const navigate = useNavigate();
   const { lobbyId } = useParams();
+  const { initialGameState } = location.state || {}; // get initial game state from lobby or menu
   let { gameType, numPlayers, playerNames } = location.state || {}; // set local settings
-  const [gameState, setGameState] = useState<GameStateType | null>(null);
+  const [gameState, setGameState] = useState<GameStateType | null>(initialGameState || null);
 
   console.log("lobby id = ", lobbyId);
+  console.log("local p names = ", playerNames);
+  console.log("local num ps = ", numPlayers);
   useEffect(() => {
     console.log("location.state: ", location.state);
     // Listener functions
-    const handleConnect = () => {
-      console.log("Game Started");
-      socket.emit("startGame", { lobbyId, numPlayers });
-    };
+    // const handleConnect = () => {
+    //   console.log("Game Started");
+    //   socket.emit("startGame", { lobbyId, numPlayers });
+    // };
 
-    // if the socket is already connected, call it manually
-    if (socket.connected) {
-      handleConnect();
-    }
+    // // if the socket is already connected, call it manually
+    // if (socket.connected) {
+    //   handleConnect();
+    // }
 
     const handleGameUpdate = (state: GameStateType) => {
       console.log("Game state updated", state);
       setGameState(state);
     };
 
-    // Attach listeners
-    socket.on("connect", handleConnect);
+    // // Attach listeners
+    // socket.on("connect", handleConnect);
     socket.on("gameStateUpdate", handleGameUpdate);
 
     // Cleanup on unmount
     return () => {
-      socket.off("connect", handleConnect);
+      // socket.off("connect", handleConnect);
       socket.off("gameStateUpdate", handleGameUpdate);
     };
   }, []);

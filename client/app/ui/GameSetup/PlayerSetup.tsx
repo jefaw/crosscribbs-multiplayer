@@ -2,12 +2,12 @@ import { useState } from "react";
 
 type ChildProps = {
   numPlayers: 2 | 4;
-  onSetPlayerNames: (playerNames: String[]) => void;
+  onSetPlayerNames: (playerNames: string[]) => void;
   onBack: () => void;
 };
 
 export default function PlayerSetup({ numPlayers, onSetPlayerNames, onBack }: ChildProps) {
-  const [playerNames, setPlayerNames] = useState<String[]>(() => Array.from({ length: numPlayers }, () => ""));
+  const [playerNames, setPlayerNames] = useState<string[]>(() => Array.from({ length: numPlayers }, () => ""));
 
   const handleNameChange = (index: number, name: string) => {
     const newPlayerNames = [...playerNames];

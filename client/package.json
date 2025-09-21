@@ -4,8 +4,6 @@
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
-    "server": "cd server && npm run dev",
-    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build-server": "cd server && npm install && npm run build",
     "build": "npm install && react-router build",
     "start-server": "cd server && npm run start",

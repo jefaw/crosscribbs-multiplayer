@@ -8,7 +8,7 @@
 
 html,
 body {
-  @apply bg-green-600;
+  @apply bg-slate-800;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
