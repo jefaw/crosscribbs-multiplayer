@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@cross-cribbs/shared-types/*": ["shared/types/*"]
+    }
+  }
+}
