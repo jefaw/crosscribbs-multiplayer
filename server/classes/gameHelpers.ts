@@ -1,6 +1,6 @@
 // gameHelpers.ts
 
-import type GameController from "server/gameController";
+import type GameController from "server/gameController.js";
 
 interface Player {
   id: string;

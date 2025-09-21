@@ -1,15 +1,15 @@
-import type { BoardType, GameStateType, RoundHistoryType } from "@shared/types/GameControllerTypes";
-import { newBoard, newDeck, tallyScores } from "./classes/Helpers";
-import Player from "./classes/Player";
-import type { CardType } from "@shared/types/CardType";
-import type { ScoreType } from "@shared/types/ScoreType";
-import type { PlayerType } from "@shared/types/PlayerType";
-import type { BoardPosition } from "@shared/types/BoardTypes";
-import type { Lobby } from "./classes/gameHelpers";
+import type { BoardType, GameStateType, RoundHistoryType } from "@shared/types/GameControllerTypes.js";
+import { newBoard, newDeck, tallyScores } from "./classes/Helpers.js";
+import Player from "./classes/Player.js";
+import type { CardType } from "@shared/types/CardType.js";
+import type { ScoreType } from "@shared/types/ScoreType.js";
+import type { PlayerType } from "@shared/types/PlayerType.js";
+import type { BoardPosition } from "@shared/types/BoardTypes.js";
+import type { LobbyType } from "@shared/types/GameControllerTypes.js";
 // import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 
 export default class GameController implements GameStateType {
-  lobby: Lobby | null;
+  lobby: LobbyType | null;
   numPlayers: number;
   deck: CardType[] | null;
   board: BoardType;
@@ -36,7 +36,7 @@ export default class GameController implements GameStateType {
   cribScore: ScoreType | null;
   heels: number; // if his heels was scored this round
 
-  constructor(numPlayers = 2, lobby: Lobby | null = null) {
+  constructor(numPlayers = 2, lobby: LobbyType | null = null) {
     this.lobby = lobby;
     this.numPlayers = numPlayers;
     this.deck = null;
@@ -293,7 +293,7 @@ export default class GameController implements GameStateType {
       this.cribScore = tallyScores(cribBoard)[0]; // only care about the row score
     }
     // Score the total using round scores
-    this.roundScores = tallyScores(this.board, cutCard);
+    this.roundScores = tallyScores(this.board, cutCard ?? undefined);
     const [rowRoundScore, columnRoundScore] = this.roundScores;
 
     if (this.dealer === 1 || this.dealer === 3) {

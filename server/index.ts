@@ -1,4 +1,3 @@
-// server/index.js
 import express from "express";
 
 import http from "http";
@@ -6,29 +5,45 @@ import { Server } from "socket.io";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import GameController from "./gameController";
-import { getGame, lobbies, games, deleteGame } from "./classes/gameHelpers";
+import GameController from "./gameController.js";
+import { getGame, lobbies, games, deleteGame } from "./classes/gameHelpers.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors());
+app.use(cors()); // {  origin: ["http://localhost:5173", "https://cross-cribbs.up.railway.app"], credentials: true,}
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "public")));
-app.use(express.static(__dirname));
+// app.use(express.static(path.join(__dirname, "..", "public")));
+// app.use(express.static(__dirname));
 
+// Serve Vite frontend build
+// const frontendPath = path.join(__dirname, "..", "client");
+// app.use(express.static(frontendPath));
+// console.log("frontendPath = ", frontendPath);
+
+// // Handle frontend routes (React Router)
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(frontendPath, "index.html"));
+// });
+
+// HTTP + Socket.io setup
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "https://cross-cribbs-production.up.railway.app",
+    ],
     methods: ["GET", "POST"],
   },
 });
-
-const PORT = process.env.PORT || 4000;
 
 let lobbyCounter = 1;
 
@@ -74,7 +89,7 @@ io.on("connection", (socket) => {
   socket.on("startGame", ({ lobbyId, numPlayers }) => {
     if (lobbyId) {
       // Multiplayer game tied to a lobby
-      const lobby = lobbies[lobbyId];
+      const lobby = lobbies[lobbyId] ?? null;
       games[lobbyId] = new GameController(numPlayers, lobby);
       const newGame = getGame(socket.id, lobbyId);
       if (!newGame) return;

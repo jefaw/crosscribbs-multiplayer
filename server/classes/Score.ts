@@ -1,4 +1,4 @@
-import type { ScoreType } from "@shared/types/ScoreType";
+import type { ScoreType } from "@shared/types/ScoreType.js";
 
 export default class Score implements ScoreType {
   pairs: number;

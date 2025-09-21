@@ -1,4 +1,4 @@
-import type { CardType } from "./CardType";
+import type { CardType } from "./CardType.js";
 
 export interface DeckType {
   deck: CardType[];

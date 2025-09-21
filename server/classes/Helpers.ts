@@ -1,9 +1,7 @@
-import Card from "@shared/classes/Card";
-import Score from "./Score";
-import type { CardType, CardValue } from "@shared/types/CardType";
-import type { BoardType } from "@shared/types/GameControllerTypes";
-import type { Socket } from "socket.io";
-import type GameController from "server/gameController";
+import Card from "./Card.js";
+import Score from "./Score.js";
+import type { CardType, CardValue } from "@shared/types/CardType.js";
+import type { BoardType } from "@shared/types/GameControllerTypes.js";
 
 function newBoard() {
   let board: BoardType = [];

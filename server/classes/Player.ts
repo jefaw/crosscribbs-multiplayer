@@ -1,5 +1,5 @@
-import type { CardType } from "@shared/types/CardType";
-import type { PlayerType } from "@shared/types/PlayerType";
+import type { CardType } from "@shared/types/CardType.js";
+import type { PlayerType } from "@shared/types/PlayerType.js";
 
 export default class Player implements PlayerType {
   id: string;

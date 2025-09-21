@@ -1,7 +1,17 @@
-import type { Lobby } from "server/classes/gameHelpers";
-import type { CardType } from "./CardType";
-import type { PlayerType } from "./PlayerType";
-import type { ScoreType } from "./ScoreType";
+import type { CardType } from "./CardType.js";
+import type { PlayerType } from "./PlayerType.js";
+import type { ScoreType } from "./ScoreType.js";
+
+export interface LobbyPlayerType {
+  id: string;
+  name: string;
+}
+
+export interface LobbyType {
+  players: LobbyPlayerType[];
+  host: string;
+  numPlayers: number;
+}
 
 // Optional: define moves/actions
 export interface MoveType {
@@ -21,7 +31,7 @@ export interface RoundHistoryType {
 }
 
 export interface GameStateType {
-  lobby: Lobby | null;
+  lobby: LobbyType | null;
   board: BoardType;
   turn: number;
   turnIndex: number;
