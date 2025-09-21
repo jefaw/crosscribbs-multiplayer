@@ -4,9 +4,6 @@
   "type": "module",
   "main": "dist/server/index.js",
   "scripts": {
-    "dev": "react-router dev",
-    "server": "cd server && npm run dev",
-    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build-server": "cd server && npm run build",
     "build": "cd client && npm run build",
     "start-server": "cd server && npm run start",
