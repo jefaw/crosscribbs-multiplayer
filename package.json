@@ -1,0 +1,16 @@
+{
+  "name": "crosscribbs",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/server/index.js",
+  "scripts": {
+    "dev": "react-router dev",
+    "server": "cd server && npm run dev",
+    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
+    "build-server": "cd server && npm run build",
+    "build": "cd client && react-router build",
+    "start-server": "cd server && npm run start",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc"
+  }
+}
