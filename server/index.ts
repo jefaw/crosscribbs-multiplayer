@@ -8,12 +8,11 @@ import { fileURLToPath } from "url";
 import GameController from "./gameController.js";
 import { getGame, lobbies, games, deleteGame } from "./classes/gameHelpers.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-console.log("serport = ", PORT);
 
 // Middleware
 app.use(cors()); // {  origin: ["http://localhost:5173", "https://cross-cribbs.up.railway.app"], credentials: true,}

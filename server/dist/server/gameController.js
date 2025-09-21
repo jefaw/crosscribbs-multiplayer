@@ -1,6 +1,6 @@
 import { newBoard, newDeck, tallyScores } from "./classes/Helpers.js";
 import Player from "./classes/Player.js";
-// import type { CardType, GameStateType, RoundHistoryType, BoardType } from "../shared/types/GameControllerTypes";
+// import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 export default class GameController {
     lobby;
     numPlayers;

@@ -2,12 +2,10 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
 import GameController from "./gameController.js";
-import { getGame, lobbies, games, deleteGame } from "./classes/gameHelpers.js";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { getGame, lobbies, games } from "./classes/gameHelpers.js";
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 4000;
 // Middleware

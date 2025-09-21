@@ -4,7 +4,10 @@ server/node_modules/
 
 # React Router
 /.react-router/
-/build/
+client/build/
+
+# server
+/server/dist
 
 .specstory/
 .cursorindexingignore/

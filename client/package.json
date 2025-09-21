@@ -7,9 +7,9 @@
     "server": "cd server && npm run dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build-server": "cd server && npm install && npm run build",
-    "build": "react-router build && npm run build-server",
+    "build": "react-router build",
     "start-server": "cd server && npm run start",
-    "start": "concurrently \"react-router-serve ./build/server/index.js\" \"npm run start-server\"",
+    "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {

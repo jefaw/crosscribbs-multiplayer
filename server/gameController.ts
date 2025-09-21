@@ -1,11 +1,11 @@
-import type { BoardType, GameStateType, RoundHistoryType } from "@shared/types/GameControllerTypes.js";
+import type { BoardType, GameStateType, RoundHistoryType } from "@cross-cribbs/shared-types/GameControllerTypes.js";
 import { newBoard, newDeck, tallyScores } from "./classes/Helpers.js";
 import Player from "./classes/Player.js";
-import type { CardType } from "@shared/types/CardType.js";
-import type { ScoreType } from "@shared/types/ScoreType.js";
-import type { PlayerType } from "@shared/types/PlayerType.js";
-import type { BoardPosition } from "@shared/types/BoardTypes.js";
-import type { LobbyType } from "@shared/types/GameControllerTypes.js";
+import type { CardType } from "@cross-cribbs/shared-types/CardType.js";
+import type { ScoreType } from "@cross-cribbs/shared-types/ScoreType.js";
+import type { PlayerType } from "@cross-cribbs/shared-types/PlayerType.js";
+import type { BoardPosition } from "@cross-cribbs/shared-types/BoardTypes.js";
+import type { LobbyType } from "@cross-cribbs/shared-types/GameControllerTypes.js";
 // import type { CardType, GameStateType, RoundHistoryType, BoardType } from "@shared/types/GameControllerTypes";
 
 export default class GameController implements GameStateType {
