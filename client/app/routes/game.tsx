@@ -10,7 +10,7 @@ import type { GameStateType } from "@cross-cribbs/shared-types/GameControllerTyp
 import type { BoardPosition } from "@cross-cribbs/shared-types/BoardTypes";
 import { socket } from "../connections/socket";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import DealerSelection from "~/ui/GameSetup/DealerSelection";
+import PlayersDisplay from "~/ui/Game/PlayersDisplay";
 
 export default function Game() {
   const location = useLocation();
@@ -25,29 +25,17 @@ export default function Game() {
   console.log("local num ps = ", numPlayers);
   useEffect(() => {
     console.log("location.state: ", location.state);
-    // Listener functions
-    // const handleConnect = () => {
-    //   console.log("Game Started");
-    //   socket.emit("startGame", { lobbyId, numPlayers });
-    // };
-
-    // // if the socket is already connected, call it manually
-    // if (socket.connected) {
-    //   handleConnect();
-    // }
 
     const handleGameUpdate = (state: GameStateType) => {
       console.log("Game state updated", state);
       setGameState(state);
     };
 
-    // // Attach listeners
-    // socket.on("connect", handleConnect);
+    // Attach listeners
     socket.on("gameStateUpdate", handleGameUpdate);
 
     // Cleanup on unmount
     return () => {
-      // socket.off("connect", handleConnect);
       socket.off("gameStateUpdate", handleGameUpdate);
     };
   }, []);
@@ -99,8 +87,8 @@ export default function Game() {
 
   return (
     <div className="bg-green-600">
-      <div className="flex flex-col md:flex-row relative h-screen items-center">
-        <div className=" md:w-1/4">
+      <div className="flex flex-col md:flex-row relative h-screen items-center gap-7">
+        <div className="md:w-1/3">
           <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
               <button
@@ -111,85 +99,17 @@ export default function Game() {
               </button>
             )}
           </div>
-          {numPlayers === 4 && (
-            <div className="flex flex-row md:block space-x-40">
-              <div className="w-1/2 md:w-full">
-                <Player
-                  name={playerNames[0]}
-                  player={gameState.player1}
-                  turn={gameState.turn}
-                  crib={gameState.crib}
-                  numPlayers={numPlayers}
-                  lobbyId={lobbyId}
-                  playerId={socket.id}
-                />
-              </div>
-              <div className="w-1/2 md:w-full">
-                <Player
-                  name={playerNames[2]}
-                  player={gameState.player3}
-                  turn={gameState.turn}
-                  crib={gameState.crib}
-                  numPlayers={numPlayers}
-                  lobbyId={lobbyId}
-                  playerId={socket.id}
-                />
-              </div>
-            </div>
-          )}
-          {numPlayers === 2 && (
-            <Player
-              name={playerNames[0]}
-              player={gameState.player1}
-              turn={gameState.turn}
-              crib={gameState.crib}
-              numPlayers={numPlayers}
-              lobbyId={lobbyId}
-              playerId={socket.id}
-            />
-          )}
+          <PlayersDisplay
+            lobbyId={lobbyId}
+            numPlayers={numPlayers}
+            playerNames={playerNames}
+            players={gameState.players}
+            turn={gameState.turn}
+            crib={gameState.crib}
+          ></PlayersDisplay>
         </div>
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-1/3">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
-        </div>
-        <div className="w-2/3 md:w-1/4">
-          {numPlayers === 4 && (
-            <div className="flex flex-row md:block space-x-40">
-              <div className="w-1/2 md:w-full">
-                <Player
-                  name={playerNames[1]}
-                  player={gameState.player2}
-                  turn={gameState.turn}
-                  crib={gameState.crib}
-                  numPlayers={numPlayers}
-                  lobbyId={lobbyId}
-                  playerId={socket.id}
-                />
-              </div>
-              <div className="w-1/2 md:w-full">
-                <Player
-                  name={playerNames[3]}
-                  player={gameState.player4}
-                  turn={gameState.turn}
-                  crib={gameState.crib}
-                  numPlayers={numPlayers}
-                  lobbyId={lobbyId}
-                  playerId={socket.id}
-                />
-              </div>
-            </div>
-          )}
-          {numPlayers === 2 && (
-            <Player
-              name={playerNames[1]}
-              player={gameState.player2}
-              turn={gameState.turn}
-              crib={gameState.crib}
-              numPlayers={numPlayers}
-              lobbyId={lobbyId}
-              playerId={socket.id}
-            />
-          )}
         </div>
         {gameState.roundScoreVisible && !gameState.gameOver && (
           <RoundScore

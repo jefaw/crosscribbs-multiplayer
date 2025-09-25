@@ -35,10 +35,7 @@ export interface GameStateType {
   board: BoardType;
   turn: number;
   turnIndex: number;
-  player1: PlayerType;
-  player2: PlayerType;
-  player3: PlayerType;
-  player4: PlayerType;
+  players: PlayerType[];
   numPlayers: number;
   selectedCard: CardType | null;
   roundScoreVisible: boolean;

@@ -13,10 +13,7 @@ export default class GameController implements GameStateType {
   numPlayers: number;
   deck: CardType[] | null;
   board: BoardType;
-  player1: PlayerType;
-  player2: PlayerType;
-  player3: PlayerType;
-  player4: PlayerType;
+  players: PlayerType[];
   turn: number;
   turnIndex: number;
   selectedCard: CardType | null;
@@ -41,10 +38,7 @@ export default class GameController implements GameStateType {
     this.numPlayers = numPlayers;
     this.deck = null;
     this.board = newBoard();
-    this.player1 = new Player("", 1, "", [], []);
-    this.player2 = new Player("", 2, "", [], []);
-    this.player3 = new Player("", 3, "", [], []);
-    this.player4 = new Player("", 4, "", [], []);
+    this.players = [];
     this.turn = 1;
     this.turnIndex = 0;
     this.selectedCard = null;
@@ -64,19 +58,26 @@ export default class GameController implements GameStateType {
     this.cribScore = null;
     this.heels = 0;
 
+    this.initializePlayers();
+
     // if multiplayer, assign socket IDs
     if (lobby) {
       const players = lobby.players;
-      if (players[0]) this.player1.id = players[0].id;
-      if (players[1]) this.player2.id = players[1].id;
-      if (players[2]) this.player3.id = players[2].id;
-      if (players[3]) this.player4.id = players[3].id;
+      for (const [index, player] of players.entries()) {
+        this.players[index].id = player.id;
+      }
       this.numPlayers = lobby.numPlayers; // set multiplayer numPlayers
     }
 
     // Initialize the game
     // this.startDealerSelection();
     this.initializeGame();
+  }
+
+  initializePlayers() {
+    for (let i = 1; i <= 4; i++) {
+      this.players.push(new Player("", 1, "", [], []));
+    }
   }
 
   get currentPlayerId(): string | void {
@@ -87,25 +88,15 @@ export default class GameController implements GameStateType {
   getPlayer(playerNumber: number): PlayerType {
     switch (playerNumber) {
       case 1:
-        return this.player1;
+        return this.players[0];
       case 2:
-        return this.player2;
+        return this.players[1];
       case 3:
-        return this.player3;
+        return this.players[2];
       case 4:
-        return this.player4;
+        return this.players[3];
       default:
         throw new Error("Invalid player number");
-    }
-  }
-
-  getPlayers() {
-    if (this.numPlayers === 2) {
-      return [this.player1, this.player2];
-    } else if (this.numPlayers === 4) {
-      return [this.player1, this.player2, this.player3, this.player4];
-    } else {
-      throw new Error("Invalid num players");
     }
   }
 
@@ -141,23 +132,22 @@ export default class GameController implements GameStateType {
     }
 
     if (this.numPlayers === 2) {
-      this.player1.hand = this.deck?.slice(1, 15) || []; // 14 cards
-      this.player2.hand = this.deck?.slice(15, 29) || []; // 14 cards
+      this.players[0].hand = this.deck?.slice(1, 15) || []; // 14 cards
+      this.players[1].hand = this.deck?.slice(15, 29) || []; // 14 cards
     } else {
-      this.player1.hand = this.deck?.slice(1, 8) || []; // 7 cards
-      this.player2.hand = this.deck?.slice(8, 15) || []; // 7 cards
-      this.player3.hand = this.deck?.slice(15, 22) || []; // 7 cards
-      this.player4.hand = this.deck?.slice(22, 29) || []; // 7 cards
+      this.players[0].hand = this.deck?.slice(1, 8) || []; // 7 cards
+      this.players[1].hand = this.deck?.slice(8, 15) || []; // 7 cards
+      this.players[2].hand = this.deck?.slice(15, 22) || []; // 7 cards
+      this.players[3].hand = this.deck?.slice(22, 29) || []; // 7 cards
     }
 
     this.crib = [];
 
-    this.player1.discardedToCrib = [];
-    this.player2.discardedToCrib = [];
-    this.player3.discardedToCrib = [];
-    this.player4.discardedToCrib = [];
+    for (const player of this.players) {
+      player.discardedToCrib = [];
+    }
 
-    this.selectedCard = this.player1.hand[this.player1.hand.length - 1];
+    this.selectedCard = this.players[0].hand[this.players[0].hand.length - 1];
   }
 
   selectCard(playerId: string, card: CardType): boolean {
@@ -196,24 +186,11 @@ export default class GameController implements GameStateType {
 
     // discard card to crib
     this.crib.push(card);
-    if (player.num === 1) {
-      this.player1.discardedToCrib.push(card);
-    } else if (player.num === 2) {
-      this.player2.discardedToCrib.push(card);
-    } else if (player.num === 3) {
-      this.player3.discardedToCrib.push(card);
-    } else if (player.num === 4) {
-      this.player4.discardedToCrib.push(card);
-    }
+    const serverPlayer = this.getPlayer(player.num);
+    serverPlayer.discardedToCrib.push(card);
 
     // remove card from Players hand
-    let hand: CardType[];
-    if (this.turn === 1) hand = this.player1.hand;
-    else if (this.turn === 2) hand = this.player2.hand;
-    else if (this.turn === 3) hand = this.player3.hand;
-    else if (this.turn === 4) hand = this.player4.hand;
-    else hand = [];
-
+    let hand: CardType[] = serverPlayer.hand;
     const cardIndex = hand.findIndex((c) => c.suit === card.suit && c.value === card.value);
     if (cardIndex > -1) {
       hand.splice(cardIndex, 1);
@@ -244,7 +221,7 @@ export default class GameController implements GameStateType {
   }
 
   isRoundOver() {
-    for (const player of this.getPlayers()) {
+    for (const player of this.players) {
       if (player.hand.length !== 0) {
         return false;
       } else if (this.forcedToDiscardToCrib(player)) {
@@ -270,13 +247,8 @@ export default class GameController implements GameStateType {
   }
 
   updateSelectedCard(): void {
-    let hand: CardType[];
-    if (this.turn === 1) hand = this.player1.hand;
-    else if (this.turn === 2) hand = this.player2.hand;
-    else if (this.turn === 3) hand = this.player3.hand;
-    else if (this.turn === 4) hand = this.player4.hand;
-    else hand = [];
-
+    // let hand: CardType[];
+    const hand = this.getPlayer(this.turn).hand;
     this.selectedCard = hand.length > 0 ? hand[hand.length - 1] : null;
   }
 
@@ -368,10 +340,7 @@ export default class GameController implements GameStateType {
       board: this.board,
       turn: this.turn,
       turnIndex: this.turnIndex,
-      player1: this.player1,
-      player2: this.player2,
-      player3: this.player3,
-      player4: this.player4,
+      players: this.players,
       numPlayers: this.numPlayers,
       selectedCard: this.selectedCard,
       roundScoreVisible: this.roundScoreVisible,
