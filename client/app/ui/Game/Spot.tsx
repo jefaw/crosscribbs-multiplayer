@@ -25,8 +25,10 @@ export default function Spot({ pos, card, playCard }: ChildProps) {
     playCard(pos);
   }
 
+  const placeholderImage = "/cards/fronts/clubs_2.svg";
+
   const cardSpotStyles =
-    "w-[77.25px] h-[108px] md:w-[93.6px] md:h-[132.2px] lg:w-[117px] lg:h-[166.5px] mx-10 mb-10 bg-stone-200 border-2 border-stone-700 hover:bg-blue-300 transition duration-300 cursor-pointer";
+    "bg-stone-200 border-2 border-stone-700 hover:bg-blue-300 transition duration-300 cursor-pointer";
 
   if (card) {
     return (
@@ -37,6 +39,8 @@ export default function Spot({ pos, card, playCard }: ChildProps) {
   }
   // Show placeholder if no card played
   return (
-    <td className={cardSpotStyles} onDragOver={handleDragOver} onDrop={handleDrop} onClick={() => playCard(pos)}></td>
+    <td className={cardSpotStyles} onDragOver={handleDragOver} onDrop={handleDrop} onClick={() => playCard(pos)}>
+      <img className="h-full invisible" src={placeholderImage} alt="" draggable="false" />
+    </td>
   );
 }

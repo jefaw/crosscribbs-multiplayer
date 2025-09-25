@@ -75,8 +75,8 @@ export default class GameController implements GameStateType {
   }
 
   initializePlayers() {
-    for (let i = 1; i <= 4; i++) {
-      this.players.push(new Player("", 1, "", [], []));
+    for (let playerNum = 1; playerNum <= this.numPlayers; playerNum++) {
+      this.players.push(new Player("", playerNum, "", [], []));
     }
   }
 

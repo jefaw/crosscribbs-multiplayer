@@ -87,7 +87,7 @@ export default function Game() {
 
   return (
     <div className="bg-green-600">
-      <div className="flex flex-col md:flex-row relative h-screen items-center gap-7">
+      <div className="flex flex-col md:flex-row relative h-screen items-center justify-center gap-7">
         <div className="md:w-1/3">
           <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
@@ -99,17 +99,26 @@ export default function Game() {
               </button>
             )}
           </div>
-          <PlayersDisplay
-            lobbyId={lobbyId}
-            numPlayers={numPlayers}
-            playerNames={playerNames}
-            players={gameState.players}
-            turn={gameState.turn}
-            crib={gameState.crib}
-          ></PlayersDisplay>
+          <div className="flex justify-center">
+            <div className="inline-flex flex-col items-center gap-10">
+              <PlayersDisplay
+                lobbyId={lobbyId}
+                numPlayers={numPlayers}
+                playerNames={playerNames}
+                players={gameState.players}
+                turn={gameState.turn}
+                crib={gameState.crib}
+              ></PlayersDisplay>
+
+              <TurnIndicator turn={gameState.turn} playerNames={playerNames} dealer={gameState.dealer} />
+            </div>
+          </div>
         </div>
         <div className="w-full md:w-1/3">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
+        </div>
+        <div className="w-full md:w-1/3">
+          {/* <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} /> */}
         </div>
         {gameState.roundScoreVisible && !gameState.gameOver && (
           <RoundScore
@@ -132,7 +141,7 @@ export default function Game() {
             onBackToMenu={handleBackToMenu}
           />
         )}
-        {!gameState.gameOver && <BottomHud gameState={gameState} playerNames={playerNames} />}
+        {/* {!gameState.gameOver && <BottomHud gameState={gameState} playerNames={playerNames} />} */}
         <RoundHistory roundHistory={gameState.roundHistory} />
       </div>
     </div>

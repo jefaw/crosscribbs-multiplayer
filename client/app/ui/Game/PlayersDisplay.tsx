@@ -14,8 +14,8 @@ type ChildProps = {
 
 export default function PlayersDisplay({ players, playerNames, numPlayers, lobbyId, turn, crib }: ChildProps) {
   return (
-    <div className="player-display">
-      <p className="text-2xl font-medium ml-2">Row Team:</p>
+    <div className="players-display">
+      <p className="text-xl font-medium ml-2">Row Team:</p>
       <div className="row-team mb-3">
         {numPlayers === 4 && (
           <div className="flex flex-row">
@@ -56,7 +56,7 @@ export default function PlayersDisplay({ players, playerNames, numPlayers, lobby
         )}
       </div>
       <div className="col-team">
-        <p className="text-2xl font-medium ml-2">Column Team:</p>
+        <p className="text-xl font-medium ml-2">Column Team:</p>
         {numPlayers === 4 && (
           <div className="flex flex-row">
             <div className="w-1/2 md:w-full">

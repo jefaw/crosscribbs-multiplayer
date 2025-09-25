@@ -27,15 +27,15 @@ export default function Board({ board, selectedCard, playCard }: ChildProps) {
 
     // Pushing row of spots into board
     displayBoard.push(
-      <tr className="" key={r}>
+      <tr className="w-full" key={r}>
         {row}
       </tr>
     );
   }
 
   return (
-    <div>
-      <table className="flex justify-center border-separate border-spacing-2">
+    <div className="w-full">
+      <table className="w-full flex justify-center border-separate border-spacing-[3px]">
         <tbody>{displayBoard}</tbody>
       </table>
     </div>
