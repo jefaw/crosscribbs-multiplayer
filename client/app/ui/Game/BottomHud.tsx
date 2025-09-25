@@ -9,7 +9,7 @@ interface BottomHudProps {
 
 export default function BottomHud({ gameState, playerNames }: BottomHudProps) {
   return (
-    <div className="fixed bottom-4 left-4 flex items-end space-x-4">
+    <div className="fixed h-29 bottom-4 left-4 flex items-end space-x-4">
       <TurnIndicator turn={gameState.turn} playerNames={playerNames} dealer={gameState.dealer} />
       <Crib crib={gameState.crib} dealer={gameState.dealer} />
     </div>

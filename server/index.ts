@@ -176,6 +176,20 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("rejoinGame", ({ lobbyId, playerId }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (game) {
+      // Update the player's socket mapping
+      // Re-join the socket to the correct room for future broadcasts
+      socket.join(lobbyId);
+      // Send the latest state to the re-joining player
+      socket.emit("gameStateUpdate", game.getGameState());
+    } else {
+      // Handle case where the lobby doesn't exist
+      socket.emit("error", { message: "Lobby not found." });
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
   });

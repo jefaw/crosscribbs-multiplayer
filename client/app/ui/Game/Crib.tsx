@@ -10,7 +10,7 @@ export default function Crib({ crib, dealer }: CribProps) {
   const dealerTeam = dealer ? (dealer % 2 !== 0 ? "Row" : "Column") : "";
 
   return (
-    <div className="bg-gray-800 p-2 rounded-lg shadow-lg">
+    <div className="bg-gray-800 h-full p-2 rounded-lg shadow-lg">
       <h3 className="text-white text-center font-bold mb-1 text-sm">Crib: {dealerTeam}</h3>
       <div className="flex space-x-1">
         {crib.map((card, i) => (

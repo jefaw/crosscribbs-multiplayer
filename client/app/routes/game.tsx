@@ -99,8 +99,8 @@ export default function Game() {
 
   return (
     <div className="bg-green-600">
-      <div className="flex flex-col xl:flex-row relative h-screen items-center">
-        <div className="w-full xl:w-1/4">
+      <div className="flex flex-col md:flex-row relative h-screen items-center">
+        <div className=" md:w-1/4">
           <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
               <button
@@ -112,26 +112,30 @@ export default function Game() {
             )}
           </div>
           {numPlayers === 4 && (
-            <>
-              <Player
-                name={playerNames[0]}
-                player={gameState.player1}
-                turn={gameState.turn}
-                crib={gameState.crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-              />
-              <Player
-                name={playerNames[2]}
-                player={gameState.player3}
-                turn={gameState.turn}
-                crib={gameState.crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-              />
-            </>
+            <div className="flex flex-row md:block space-x-40">
+              <div className="w-1/2 md:w-full">
+                <Player
+                  name={playerNames[0]}
+                  player={gameState.player1}
+                  turn={gameState.turn}
+                  crib={gameState.crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                />
+              </div>
+              <div className="w-1/2 md:w-full">
+                <Player
+                  name={playerNames[2]}
+                  player={gameState.player3}
+                  turn={gameState.turn}
+                  crib={gameState.crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                />
+              </div>
+            </div>
           )}
           {numPlayers === 2 && (
             <Player
@@ -145,31 +149,35 @@ export default function Game() {
             />
           )}
         </div>
-        <div className="w-full xl:w-1/2">
+        <div className="w-full md:w-1/2">
           <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
         </div>
-        <div className="w-full xl:w-1/4">
+        <div className="w-2/3 md:w-1/4">
           {numPlayers === 4 && (
-            <>
-              <Player
-                name={playerNames[1]}
-                player={gameState.player2}
-                turn={gameState.turn}
-                crib={gameState.crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-              />
-              <Player
-                name={playerNames[3]}
-                player={gameState.player4}
-                turn={gameState.turn}
-                crib={gameState.crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-              />
-            </>
+            <div className="flex flex-row md:block space-x-40">
+              <div className="w-1/2 md:w-full">
+                <Player
+                  name={playerNames[1]}
+                  player={gameState.player2}
+                  turn={gameState.turn}
+                  crib={gameState.crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                />
+              </div>
+              <div className="w-1/2 md:w-full">
+                <Player
+                  name={playerNames[3]}
+                  player={gameState.player4}
+                  turn={gameState.turn}
+                  crib={gameState.crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                />
+              </div>
+            </div>
           )}
           {numPlayers === 2 && (
             <Player
