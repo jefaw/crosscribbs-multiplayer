@@ -7,14 +7,14 @@ export default function Header({ totalScores, backToMenu }: ChildProps) {
   const colScore = totalScores[1];
   return (
     <div className="Header flex bg-slate-700 items-center md:p-2">
-      <div className="left-buttons p-2 w-1/3 text-xs md:text-sm text-white ">
+      <div className="left-buttons w-1/3 text-xs md:text-sm text-white p-2 ">
         <button
           className="bg-gray-500 hover:bg-gray-600 font-bold py-1.5 px-2 md:px-4 rounded transition-colors duration-200 mr-2"
           onClick={backToMenu}
         >
           Back to Menu
         </button>
-        <button className="hidden md:block bg-gray-500 hover:bg-gray-600 font-bold py-1.5 px-4 rounded transition-colors duration-200 mr-5">
+        <button className="hidden md:inline bg-gray-500 hover:bg-gray-600 font-bold py-1.5 px-4 rounded transition-colors duration-200 mr-5">
           Instructions
         </button>
       </div>

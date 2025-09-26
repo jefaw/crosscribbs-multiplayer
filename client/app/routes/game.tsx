@@ -130,7 +130,7 @@ export default function Game() {
         <div className="w-full md:w-1/3">
           <Board board={gameState.board} playCard={playCard} turn={gameState.turn} cardSizes={cardSizes} />
         </div>
-        <div className="w-full md:w-1/3">
+        <div className="md:w-1/3">
           <div className="flex justify-center">
             <div className="inline-flex flex-col items-center gap-10">
               <Crib crib={gameState.crib} dealer={gameState.dealer} cardSizes={cardSizes} />
