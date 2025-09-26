@@ -23,11 +23,11 @@ export default function PlayersDisplay({
   cardSizes,
 }: ChildProps) {
   return (
-    <div className="w-full players-display text-xs md:text-base font-medium flex justify-center italic md:not-italic">
+    <div className="w-full players-display text-xs md:text-base font-medium flex justify-center italic md:not-italic mt-2">
       {numPlayers === 4 ? (
         <div className="flex flex-col md:flex-col">
           {/* Players row */}
-          <div className="flex flex-row justify-center md:flex-col gap-3 md:gap-3">
+          <div className="flex flex-row justify-center md:flex-col gap-6 md:gap-3">
             <div className="flex flex-col gap-2">
               <span className="text-center font-medium">Row Team:</span>
               {/* Row Team Players */}

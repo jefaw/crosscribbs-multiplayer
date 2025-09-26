@@ -12,25 +12,25 @@ export default function GameOver({ winner, totalScores, resetGame, roundHistory,
   return (
     <div
       className="absolute inset-0 mx-auto my-auto w-[330px] h-[450px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
-      transition-opacity ease-in duration-700 overflow-y-auto"
+      transition-opacity ease-in duration-700 overflow-y-auto text-sm"
     >
-      <h2 className="text-center text-3xl mb-3">Game Over!</h2>
+      <h2 className="text-center text-2xl md:text-3xl md:mb-3 mb-1">Game Over!</h2>
       <div className="flex flex-col">
-        <div className="w-full flex justify-center mb-3 text-center">
+        <div className="w-full flex justify-center mb-1 md:mb-3 text-center">
           <div>
-            <h3 className="font-bold text-3xl text-cyan-400">Row</h3>
-            <p className="text-2xl">Total Score: {totalScores[0]}</p>
+            <h3 className="font-bold text-lg md:text-3xl text-cyan-400">Row</h3>
+            <p className="md:text-2xl">Total Score: {totalScores[0]}</p>
           </div>
         </div>
-        <div className="w-full flex justify-center mb-3 text-center">
+        <div className="w-full flex justify-center mb-1 md:mb-3 text-center">
           <div>
-            <h3 className="font-bold text-3xl text-fuchsia-400">Column</h3>
-            <p className="text-2xl mb-2">Total Score: {totalScores[1]}</p>
-            <p className="font-semi-bold text-xl bg-emerald-600 rounded-md mb-1 italic">{winner} wins the game!</p>
+            <h3 className="font-bold text-lg md:text-3xl text-fuchsia-400">Column</h3>
+            <p className="md:text-2xl mb-2">Total Score: {totalScores[1]}</p>
+            <p className="font-semi-bold md:text-xl bg-emerald-600 rounded-md mb-1 italic">{winner} wins the game!</p>
           </div>
         </div>
 
-        <div className="mt-4 mb-4">
+        <div className="mt-1 md:mt-4 mb-4">
           <h3 className="text-lg font-bold mb-2">Round History</h3>
           <div className="space-y-2">
             {roundHistory.map((round) => (
@@ -53,13 +53,13 @@ export default function GameOver({ winner, totalScores, resetGame, roundHistory,
         <div className="space-y-2 mt-auto">
           <button
             onClick={resetGame}
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg md:text-lg transition-colors duration-200"
           >
             Play Again
           </button>
           <button
             onClick={onBackToMenu}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
+            className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg md:text-lg transition-colors duration-200"
           >
             Back to Menu
           </button>
