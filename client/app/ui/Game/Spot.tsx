@@ -48,9 +48,9 @@ export default function Spot({ pos, card, playCard, turn, cardSizes }: ChildProp
   }
 
   const placeholderImage = "/cards/fronts/clubs_2.svg";
-  const hover = "bg-blue-300";
+  const hover = "hover:bg-blue-300";
 
-  const cardSpotStyles = `${isOver ? hover : "bg-stone-200"} ${cardSizes.base} ${cardSizes.md} ${cardSizes.xl}  border-2 border-stone-700 hover:${hover} transition duration-300 cursor-pointer1`;
+  const cardSpotStyles = `${isOver ? "bg-blue-300" : "bg-stone-200"} ${cardSizes.base} ${cardSizes.md} ${cardSizes.xl}  border-2 border-stone-700 ${hover} transition duration-300 cursor-pointer1`;
 
   if (card) {
     return (

@@ -49,8 +49,8 @@ export default function RoundScore({
 
   return (
     <div
-      className="absolute inset-0 mx-auto my-auto w-[320px] h-[600px] md:w-[500px] md:h-[700px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
-      transition-opacity ease-in duration-700 text-sm"
+      className="absolute inset-0 mx-auto my-auto w-[320px] h-[600px] md:w-[600px] md:h-[700px] lg:w-[650px] lg:h-[750px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
+      transition-opacity ease-in duration-700 text-sm md:text-base"
     >
       <h2 className="text-center text-lg md:text-3xl mb-3">Round Summary</h2>
       <p className="font-semi-bold md:text-lg bg-emerald-600 rounded-md mb-1 italic w-fit px-4 mx-auto">

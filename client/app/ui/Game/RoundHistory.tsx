@@ -5,7 +5,7 @@ type ChildProps = {
 };
 
 export default function RoundHistory({ roundHistory }: ChildProps) {
-  if (roundHistory.length === 0) return null;
+  // if (roundHistory.length === 0) return null;
 
   // Calculate running totals in chronological order
   let rowTotal = 0;
@@ -24,8 +24,8 @@ export default function RoundHistory({ roundHistory }: ChildProps) {
   const reversedTotals = [...chronologicalTotals].reverse();
 
   return (
-    <div className="hidden md:block bg-slate-600 w-full text-white p-4 rounded-lg shadow-lg max-h-[300px] lg:max-h-[500px] overflow-y-auto">
-      <h3 className="text-lg font-bold mb-3">Round History</h3>
+    <div className="hidden md:block bg-slate-600 w-full text-white p-4 rounded-lg shadow-lg min-h-[300px] lg:min-h-[450px] max-h-[450px] lg:max-h-[500px] overflow-y-auto">
+      <h3 className="text-lg font-bold mb-3 text-center">Round History</h3>
       <div className="space-y-3">
         {reversedHistory.map((round, index) => (
           <div key={round.round} className="text-sm border-b border-slate-500 pb-2">

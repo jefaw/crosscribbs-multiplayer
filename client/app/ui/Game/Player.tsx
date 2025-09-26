@@ -41,8 +41,9 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
 
   const isTurn = player.num === turn;
   const isPlayer = playerId === player.id;
-  const isDraggable = isTurn && !lobbyId ? true : isPlayer;
-  const outlineColor = player.num % 2 === 0 ? "outline-cyan-400" : "outline-fuchsia-400";
+  const isDraggable = isTurn && (!lobbyId || isPlayer);
+  console.log(`isDraggable = ${isDraggable} isTurn = ${isTurn}`);
+  const outlineColor = player.num % 2 === 0 ? "outline-fuchsia-400" : "outline-cyan-400";
   const outlineStyle = isTurn ? `outline-3 md:outline-8 ${outlineColor}` : "outline-2 outline-stone-700";
   const bgGradient =
     player.num === 1
@@ -67,7 +68,7 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
 
       <button
         onClick={handleDiscard}
-        className={`${displayDiscardButtonClass} bg-red-500 hover:bg-red-700 text-white font-bold py-0.5 md:py-3 px-2 md:px-3 rounded md:text-sm`}
+        className={`${displayDiscardButtonClass} bg-red-500 hover:bg-red-700 text-white font-bold py-0.5 px-2 md:p-2 rounded md:text-sm`}
       >
         Discard to Crib
       </button>

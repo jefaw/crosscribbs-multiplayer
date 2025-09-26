@@ -11,7 +11,7 @@ type ChildProps = {
 export default function GameOver({ winner, totalScores, resetGame, roundHistory, onBackToMenu }: ChildProps) {
   return (
     <div
-      className="absolute inset-0 mx-auto my-auto w-[330px] h-[450px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
+      className="absolute inset-0 mx-auto my-auto w-[330px] h-[450px] md:w-[500px] md:h-[700px] p-5 bg-slate-600 opacity-95 text-white rounded-lg border-2 border-solid border-slate-800
       transition-opacity ease-in duration-700 overflow-y-auto text-sm"
     >
       <h2 className="text-center text-2xl md:text-3xl md:mb-3 mb-1">Game Over!</h2>
