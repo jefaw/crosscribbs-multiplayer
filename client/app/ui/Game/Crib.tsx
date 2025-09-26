@@ -12,7 +12,7 @@ export default function Crib({ crib, dealer, cardSizes }: CribProps) {
   const MAX_CARDS = 4;
 
   return (
-    <div className="bg-slate-600 min-w-100 p-4 rounded-lg shadow-lg">
+    <div className="bg-slate-600 min-w-100 p-3 m:p-4 rounded-lg shadow-lg">
       <h3 className="text-white text-center font-bold text-lg mb-3">Crib: {dealerTeam}</h3>
       <div className="flex space-x-3">
         <div className="flex space-x-2">

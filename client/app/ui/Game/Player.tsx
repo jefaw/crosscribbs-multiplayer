@@ -43,7 +43,7 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
   const isPlayer = playerId === player.id;
   const isDraggable = isTurn && !lobbyId ? true : isPlayer;
   const outlineColor = player.num % 2 === 0 ? "outline-cyan-400" : "outline-fuchsia-400";
-  const outlineStyle = isTurn ? `outline-8 ${outlineColor}` : "outline-2 outline-stone-700";
+  const outlineStyle = isTurn ? `outline-3 md:outline-8 ${outlineColor}` : "outline-2 outline-stone-700";
   const bgGradient =
     player.num === 1
       ? "bg-gradient-to-br from-slate-100 to-slate-200"
@@ -55,9 +55,9 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
   const displayCardImage = card ? "" : "invisible";
   // Only show card if it's the player's turn
   const gameInfo = (
-    <div className="flex flex-col items-center space-y-0.5 md:space-y-2">
+    <div className="flex flex-col items-center space-y-0.5 md:space-y-2 max-w-16 md:max-w-none">
       <img
-        className={`${displayCardImage} ${cardSizes.base} ${cardSizes.md} ${cardSizes.xl} self-center hover:border-gray-700 border-transparent border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105`}
+        className={`${displayCardImage} ${cardSizes.base} ${cardSizes.md} ${cardSizes.xl} self-center hover:border-gray-700 border-transparent border-[0.5px] md:border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105`}
         src={cardImgSrc}
         alt=""
         draggable={isDraggable}
@@ -67,7 +67,7 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
 
       <button
         onClick={handleDiscard}
-        className={`${displayDiscardButtonClass} bg-red-500 hover:bg-red-700 text-white font-bold py-0.5 md:py-3 px-3 rounded md:text-sm`}
+        className={`${displayDiscardButtonClass} bg-red-500 hover:bg-red-700 text-white font-bold py-0.5 md:py-3 px-2 md:px-3 rounded md:text-sm`}
       >
         Discard to Crib
       </button>
@@ -78,7 +78,7 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
 
   return (
     <div
-      className={`flex flex-col justify-center ${bgGradient} max-w-50 my-4 p-2 md:m-2 md:py-4 md:px-2 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
+      className={`flex flex-col justify-center ${bgGradient} max-w-50 p-2 md:m-2 md:py-4 md:px-2 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
     >
       <div className="flex items-center justify-center mb-1 md:mb-3">
         <h1 className="md:text-xl font-bold text-gray-800">{name}</h1>

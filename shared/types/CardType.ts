@@ -21,5 +21,4 @@ export interface CardSizesType {
   base: string;
   md: string;
   xl: string;
-  maxBase: string;
 }

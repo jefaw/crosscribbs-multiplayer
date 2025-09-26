@@ -93,8 +93,8 @@ export default function Game() {
 
   return (
     <div className="bg-green-600">
-      <div className="flex flex-col md:flex-row relative h-screen items-center justify-center gap-7">
-        <div className="md:w-1/3">
+      <div className="flex flex-col md:flex-row relative h-screen items-center justify-center gap-5 md:gap-7">
+        <div className="w-full md:w-1/3">
           <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
               <button
@@ -106,7 +106,7 @@ export default function Game() {
             )}
           </div>
           <div className="flex justify-center">
-            <div className="inline-flex flex-col items-center gap-10">
+            <div className="flex flex-col items-center gap-10">
               <PlayersDisplay
                 lobbyId={lobbyId}
                 numPlayers={numPlayers}

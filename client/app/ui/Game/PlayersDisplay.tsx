@@ -23,93 +23,97 @@ export default function PlayersDisplay({
   cardSizes,
 }: ChildProps) {
   return (
-    <div className="players-display text-xs md:text-base ">
-      <p className="md:text-xl font-medium ml-2">Row Team:</p>
-      <div className="row-team md:mb-3">
-        {numPlayers === 4 && (
-          <div className="flex flex-row">
-            <div className="w-1/2 md:w-full">
-              <Player
-                name={playerNames[0]}
-                player={players[0]}
-                turn={turn}
-                crib={crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-                cardSizes={cardSizes}
-              />
+    <div className="w-full players-display text-xs md:text-base font-medium flex justify-center italic md:not-italic">
+      {numPlayers === 4 ? (
+        <div className="flex flex-col md:flex-col">
+          {/* Players row */}
+          <div className="flex flex-row justify-center md:flex-col gap-3 md:gap-3">
+            <div className="flex flex-col gap-2">
+              <span className="text-center font-medium">Row Team:</span>
+              {/* Row Team Players */}
+              <div className="flex flex-row gap-2">
+                <Player
+                  name={playerNames[0]}
+                  player={players[0]}
+                  turn={turn}
+                  crib={crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                  cardSizes={cardSizes}
+                />
+                <Player
+                  name={playerNames[2]}
+                  player={players[2]}
+                  turn={turn}
+                  crib={crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                  cardSizes={cardSizes}
+                />
+              </div>
             </div>
-            <div className="w-1/2 md:w-full">
-              <Player
-                name={playerNames[2]}
-                player={players[2]}
-                turn={turn}
-                crib={crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-                cardSizes={cardSizes}
-              />
-            </div>
-          </div>
-        )}
-        {numPlayers === 2 && (
-          <Player
-            name={playerNames[0]}
-            player={players[0]}
-            turn={turn}
-            crib={crib}
-            numPlayers={numPlayers}
-            lobbyId={lobbyId}
-            playerId={socket.id}
-            cardSizes={cardSizes}
-          />
-        )}
-      </div>
-      <div className="col-team">
-        <p className="md:text-xl font-medium ml-2 text-center md:text-left">Column Team:</p>
-        {numPlayers === 4 && (
-          <div className="flex flex-row">
-            <div className="w-1/2 md:w-full">
-              <Player
-                name={playerNames[1]}
-                player={players[1]}
-                turn={turn}
-                crib={crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-                cardSizes={cardSizes}
-              />
-            </div>
-            <div className="w-1/2 md:w-full">
-              <Player
-                name={playerNames[3]}
-                player={players[3]}
-                turn={turn}
-                crib={crib}
-                numPlayers={numPlayers}
-                lobbyId={lobbyId}
-                playerId={socket.id}
-                cardSizes={cardSizes}
-              />
+
+            <div className="flex flex-col gap-2">
+              <span className="text-center font-medium">Column Team:</span>
+              {/* Column Team Players */}
+              <div className="flex flex-row gap-2 md:gap-0">
+                <Player
+                  name={playerNames[1]}
+                  player={players[1]}
+                  turn={turn}
+                  crib={crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                  cardSizes={cardSizes}
+                />
+                <Player
+                  name={playerNames[3]}
+                  player={players[3]}
+                  turn={turn}
+                  crib={crib}
+                  numPlayers={numPlayers}
+                  lobbyId={lobbyId}
+                  playerId={socket.id}
+                  cardSizes={cardSizes}
+                />
+              </div>
             </div>
           </div>
-        )}
-        {numPlayers === 2 && (
-          <Player
-            name={playerNames[1]}
-            player={players[1]}
-            turn={turn}
-            crib={crib}
-            numPlayers={numPlayers}
-            lobbyId={lobbyId}
-            playerId={socket.id}
-            cardSizes={cardSizes}
-          />
-        )}
-      </div>
+        </div>
+      ) : (
+        // 2 player layout
+        <div className="flex flex-row gap-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-center font-medium">Row:</span>
+            <Player
+              name={playerNames[0]}
+              player={players[0]}
+              turn={turn}
+              crib={crib}
+              numPlayers={numPlayers}
+              lobbyId={lobbyId}
+              playerId={socket.id}
+              cardSizes={cardSizes}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-center font-medium">Column:</span>
+            <Player
+              name={playerNames[1]}
+              player={players[1]}
+              turn={turn}
+              crib={crib}
+              numPlayers={numPlayers}
+              lobbyId={lobbyId}
+              playerId={socket.id}
+              cardSizes={cardSizes}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
