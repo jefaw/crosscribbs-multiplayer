@@ -11,6 +11,7 @@ import type { BoardPosition } from "@cross-cribbs/shared-types/BoardTypes";
 import { socket } from "../connections/socket";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import PlayersDisplay from "~/ui/Game/PlayersDisplay";
+import Header from "~/ui/Game/Header";
 
 export default function Game() {
   const location = useLocation();
@@ -92,10 +93,11 @@ export default function Game() {
   };
 
   return (
-    <div className="bg-green-600">
-      <div className="flex flex-col md:flex-row relative h-screen items-center justify-center gap-5 md:gap-7">
+    <div className="bg-green-600 h-screen flex flex-col">
+      <Header totalScores={gameState.totalScores} backToMenu={handleBackToMenu} />
+      <div className="flex-1 flex flex-col md:flex-row relative items-center justify-center gap-5 md:gap-7">
         <div className="w-full md:w-1/3">
-          <div className="flex justify-start mb-4 pt-2">
+          {/* <div className="flex justify-start mb-4 pt-2">
             {!gameState.gameOver && (
               <button
                 onClick={handleBackToMenu}
@@ -104,7 +106,7 @@ export default function Game() {
                 Back to Menu
               </button>
             )}
-          </div>
+          </div> */}
           <div className="flex justify-center">
             <div className="flex flex-col items-center gap-10">
               <PlayersDisplay

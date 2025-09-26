@@ -85,7 +85,7 @@ export default function PlayersDisplay({
         </div>
       ) : (
         // 2 player layout
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row gap-12 md:gap-2">
           <div className="flex flex-col gap-2">
             <span className="text-center font-medium">Row:</span>
             <Player

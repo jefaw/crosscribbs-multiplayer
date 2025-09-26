@@ -78,7 +78,7 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
 
   return (
     <div
-      className={`flex flex-col justify-center ${bgGradient} max-w-50 p-2 md:m-2 md:py-4 md:px-2 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
+      className={`flex flex-col justify-center ${bgGradient} max-w-50 p-2 md:m-2 md:px-10 md:py-3 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
     >
       <div className="flex items-center justify-center mb-1 md:mb-3">
         <h1 className="md:text-xl font-bold text-gray-800">{name}</h1>
