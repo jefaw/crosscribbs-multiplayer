@@ -51,7 +51,7 @@ export default function PlayerSetup({ numPlayers, onSetPlayerNames, onBack }: Ch
           Start Game
         </button>
       </div>
-      <BackButton />
+      <BackButton handler={onBack} />
     </div>
   );
 }
