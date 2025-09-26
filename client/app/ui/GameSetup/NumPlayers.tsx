@@ -1,3 +1,5 @@
+import BackButton from "./BackButton";
+
 type ChildProps = {
   onSelect: (onSelect: 2 | 4) => void;
   onBack: () => void;
@@ -19,12 +21,7 @@ export default function NumPlayers({ onSelect, onBack }: ChildProps) {
       >
         2v2
       </button>
-      <button
-        onClick={() => onBack()}
-        className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-base transition-colors duration-200"
-      >
-        Back
-      </button>
+      <BackButton handler={onBack} />
     </div>
   );
 }

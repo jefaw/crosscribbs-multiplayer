@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLobby } from "~/hooks/useLobby";
+import BackButton from "~/ui/GameSetup/BackButton";
 
 export default function HostGame() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function HostGame() {
         </h1>
       </div>
       <div className="bg-slate-700 p-8 rounded-lg shadow-xl w-[400px]">
-        <h2 className="text-2xl font-bold text-white mb-6">Host Game</h2>
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">Host Game</h2>
 
         <div className="mb-4">
           <label htmlFor="username" className="block text-white text-lg font-bold mb-2">
@@ -82,17 +83,12 @@ export default function HostGame() {
 
         <button
           onClick={handleHostGame}
-          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 mb-4"
         >
           Host Game
         </button>
 
-        <button
-          onClick={() => navigate(-1)}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 mt-4"
-        >
-          Back
-        </button>
+        <BackButton />
       </div>
     </div>
   );

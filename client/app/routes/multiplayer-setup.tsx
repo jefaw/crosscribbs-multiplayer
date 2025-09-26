@@ -11,7 +11,7 @@ export default function MultiplayerSetup() {
         </h1>
       </div>
       <div className="bg-slate-700 p-8 rounded-lg shadow-xl w-[400px]">
-        <h2 className="text-2xl font-bold text-white mb-6">Multiplayer</h2>
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">Multiplayer</h2>
         <div className="space-y-4">
           <button
             onClick={() => navigate("/host-game")}
@@ -24,6 +24,12 @@ export default function MultiplayerSetup() {
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
           >
             Join Game
+          </button>
+          <button
+            onClick={() => navigate(-1)}
+            className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-base transition-colors duration-200"
+          >
+            Back
           </button>
         </div>
       </div>

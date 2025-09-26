@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import BackButton from "./BackButton";
 
 type ChildProps = {
   onSelect: (gameType: "local" | "online") => void;
+  onBack: () => void;
 };
 
-export default function LocalOrOnline({ onSelect }: ChildProps) {
+export default function LocalOrOnline({ onSelect, onBack }: ChildProps) {
   const navigate = useNavigate();
   return (
     <div className="space-y-4">
@@ -21,6 +23,7 @@ export default function LocalOrOnline({ onSelect }: ChildProps) {
       >
         Online Multiplayer
       </button>
+      <BackButton handler={onBack} />
     </div>
   );
 }

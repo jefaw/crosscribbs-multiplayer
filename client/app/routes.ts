@@ -1,8 +1,8 @@
 import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
 export default [
-  index("routes/menu.tsx"),
-  route("home", "routes/home.tsx"),
+  index("routes/home.tsx"),
+  route("menu", "routes/menu.tsx"),
   route("test-socket", "routes/test-socket.tsx"),
   route("game", "routes/game.tsx", { id: "local-game" }),
   route("game/:lobbyId", "routes/game.tsx", { id: "multiplayer-game" }),

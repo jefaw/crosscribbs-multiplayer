@@ -65,6 +65,7 @@ export default function GameSetup() {
               setGameType(type);
               goToNextPage("numPlayers");
             }}
+            onBack={goBack}
           />
         )}
         {currentPage === "numPlayers" && (

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { socket } from "~/connections/socket";
 import { useLobby } from "~/hooks/useLobby";
+import BackButton from "~/ui/GameSetup/BackButton";
 
 interface PlayerInfo {
   id: string;
@@ -54,7 +55,7 @@ export default function Lobby() {
         </h1>
       </div>
       <div className="bg-slate-700 p-8 rounded-lg shadow-xl w-[400px]">
-        <h2 className="text-2xl font-bold text-white mb-6">Game Lobby</h2>
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">Game Lobby</h2>
         <p className="text-white text-lg mb-4">
           Lobby ID: <span className="font-bold text-cyan-300">{lobbyId}</span>
         </p>
@@ -83,18 +84,13 @@ export default function Lobby() {
           <button
             onClick={handleStartGame}
             disabled={!canStartGame}
-            className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 ${canStartGame ? "bg-green-500 hover:bg-green-600" : "bg-gray-500 opacity-50 cursor-not-allowed"}`}
+            className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 mb-4 ${canStartGame ? "bg-green-500 hover:bg-green-600" : "bg-gray-500 opacity-50 cursor-not-allowed"}`}
           >
             Start Game
           </button>
         )}
 
-        <button
-          onClick={() => navigate(-1)}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 mt-4"
-        >
-          Back
-        </button>
+        <BackButton />
       </div>
     </div>
   );

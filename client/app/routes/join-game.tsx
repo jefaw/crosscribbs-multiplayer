@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "~/connections/socket";
 import { useLobby } from "~/hooks/useLobby";
+import BackButton from "~/ui/GameSetup/BackButton";
 
 export default function JoinGame() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function JoinGame() {
         </h1>
       </div>
       <div className="bg-slate-700 p-8 rounded-lg shadow-xl w-[400px]">
-        <h2 className="text-2xl font-bold text-white mb-6">Join Game</h2>
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">Join Game</h2>
 
         <div className="mb-4">
           <label htmlFor="username" className="block text-white text-lg font-bold mb-2">
@@ -63,17 +64,12 @@ export default function JoinGame() {
 
         <button
           onClick={handleJoinGame}
-          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200"
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 mb-4"
         >
           Join Game
         </button>
 
-        <button
-          onClick={() => navigate(-1)}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 mt-4"
-        >
-          Back
-        </button>
+        <BackButton />
       </div>
     </div>
   );
