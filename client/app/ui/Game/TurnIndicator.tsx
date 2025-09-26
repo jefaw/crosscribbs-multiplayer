@@ -2,9 +2,10 @@ type ChildProps = {
   turn: number;
   playerNames: string[];
   dealer: number | null;
+  className: string;
 };
 
-export default function TurnIndicator({ turn, playerNames, dealer }: ChildProps) {
+export default function TurnIndicator({ turn, playerNames, dealer, className }: ChildProps) {
   const numPlayers = playerNames.length;
   const getTurnMessage = () => {
     if (numPlayers > 0 && turn > 0 && turn <= numPlayers) {
@@ -14,7 +15,7 @@ export default function TurnIndicator({ turn, playerNames, dealer }: ChildProps)
   };
 
   return (
-    <div className="w-full bg-slate-600 text-white p-3 rounded-lg shadow-lg">
+    <div className={`${className} w-full bg-slate-600 text-white p-3 rounded-lg shadow-lg`}>
       {playerNames.map((name, index) => {
         const playerNum = index + 1;
         const isTurn = turn === playerNum;

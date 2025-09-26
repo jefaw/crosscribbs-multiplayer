@@ -1,7 +1,7 @@
 import Player from "./Player";
 import { socket } from "../../connections/socket";
 import type { PlayerType } from "@cross-cribbs/shared-types/PlayerType";
-import type { CardType } from "@cross-cribbs/shared-types/CardType";
+import type { CardSizesType, CardType } from "@cross-cribbs/shared-types/CardType";
 
 type ChildProps = {
   players: PlayerType[];
@@ -10,13 +10,22 @@ type ChildProps = {
   lobbyId: string | undefined;
   turn: number;
   crib: CardType[];
+  cardSizes: CardSizesType;
 };
 
-export default function PlayersDisplay({ players, playerNames, numPlayers, lobbyId, turn, crib }: ChildProps) {
+export default function PlayersDisplay({
+  players,
+  playerNames,
+  numPlayers,
+  lobbyId,
+  turn,
+  crib,
+  cardSizes,
+}: ChildProps) {
   return (
-    <div className="players-display">
-      <p className="text-xl font-medium ml-2">Row Team:</p>
-      <div className="row-team mb-3">
+    <div className="players-display text-xs md:text-base ">
+      <p className="md:text-xl font-medium ml-2">Row Team:</p>
+      <div className="row-team md:mb-3">
         {numPlayers === 4 && (
           <div className="flex flex-row">
             <div className="w-1/2 md:w-full">
@@ -28,6 +37,7 @@ export default function PlayersDisplay({ players, playerNames, numPlayers, lobby
                 numPlayers={numPlayers}
                 lobbyId={lobbyId}
                 playerId={socket.id}
+                cardSizes={cardSizes}
               />
             </div>
             <div className="w-1/2 md:w-full">
@@ -39,6 +49,7 @@ export default function PlayersDisplay({ players, playerNames, numPlayers, lobby
                 numPlayers={numPlayers}
                 lobbyId={lobbyId}
                 playerId={socket.id}
+                cardSizes={cardSizes}
               />
             </div>
           </div>
@@ -52,11 +63,12 @@ export default function PlayersDisplay({ players, playerNames, numPlayers, lobby
             numPlayers={numPlayers}
             lobbyId={lobbyId}
             playerId={socket.id}
+            cardSizes={cardSizes}
           />
         )}
       </div>
       <div className="col-team">
-        <p className="text-xl font-medium ml-2">Column Team:</p>
+        <p className="md:text-xl font-medium ml-2 text-center md:text-left">Column Team:</p>
         {numPlayers === 4 && (
           <div className="flex flex-row">
             <div className="w-1/2 md:w-full">
@@ -68,6 +80,7 @@ export default function PlayersDisplay({ players, playerNames, numPlayers, lobby
                 numPlayers={numPlayers}
                 lobbyId={lobbyId}
                 playerId={socket.id}
+                cardSizes={cardSizes}
               />
             </div>
             <div className="w-1/2 md:w-full">
@@ -79,6 +92,7 @@ export default function PlayersDisplay({ players, playerNames, numPlayers, lobby
                 numPlayers={numPlayers}
                 lobbyId={lobbyId}
                 playerId={socket.id}
+                cardSizes={cardSizes}
               />
             </div>
           </div>
@@ -92,6 +106,7 @@ export default function PlayersDisplay({ players, playerNames, numPlayers, lobby
             numPlayers={numPlayers}
             lobbyId={lobbyId}
             playerId={socket.id}
+            cardSizes={cardSizes}
           />
         )}
       </div>

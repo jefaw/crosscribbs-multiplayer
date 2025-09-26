@@ -5,7 +5,7 @@
 - Handles card selection and drag events
 */
 
-import type { CardType } from "@cross-cribbs/shared-types/CardType";
+import type { CardSizesType, CardType } from "@cross-cribbs/shared-types/CardType";
 import type { PlayerType } from "@cross-cribbs/shared-types/PlayerType";
 import { socket } from "~/connections/socket";
 
@@ -17,9 +17,10 @@ type ChildProps = {
   numPlayers: number;
   lobbyId: string | undefined;
   playerId: string | undefined;
+  cardSizes: CardSizesType;
 };
 
-export default function Player({ name, player, turn, lobbyId, numPlayers, playerId }: ChildProps) {
+export default function Player({ name, player, turn, lobbyId, numPlayers, playerId, cardSizes }: ChildProps) {
   const { hand, discardedToCrib } = player;
   // hand = props.hand
 
@@ -29,6 +30,7 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
 
   function handleDragStart(e: any) {
     e.dataTransfer.effectAllowed = "move"; // don't show plus icon on drag
+    e.dataTransfer.setData("application/player", JSON.stringify(player));
   }
 
   function handleDiscard() {
@@ -38,6 +40,8 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
   }
 
   const isTurn = player.num === turn;
+  const isPlayer = playerId === player.id;
+  const isDraggable = isTurn && !lobbyId ? true : isPlayer;
   const outlineColor = player.num % 2 === 0 ? "outline-cyan-400" : "outline-fuchsia-400";
   const outlineStyle = isTurn ? `outline-8 ${outlineColor}` : "outline-2 outline-stone-700";
   const bgGradient =
@@ -51,19 +55,19 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
   const displayCardImage = card ? "" : "invisible";
   // Only show card if it's the player's turn
   const gameInfo = (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col items-center space-y-0.5 md:space-y-2">
       <img
-        className={`${displayCardImage} w-[77.25px] h-[108px] md:w-[81.9px] md:h-[116.55px] self-center hover:border-gray-700 border-transparent border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105`}
+        className={`${displayCardImage} ${cardSizes.base} ${cardSizes.md} ${cardSizes.xl} self-center hover:border-gray-700 border-transparent border-2 cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105`}
         src={cardImgSrc}
         alt=""
-        draggable={true}
+        draggable={isDraggable}
         onDragStart={handleDragStart}
       />
       <p className={`${displayCardsLeft} text-xs md:text-base font-medium text-gray-700`}>Cards: {hand.length}</p>
 
       <button
         onClick={handleDiscard}
-        className={`${displayDiscardButtonClass} bg-red-500 hover:bg-red-700 text-white font-bold py-[6px] px-3 rounded text-xs md:text-sm`}
+        className={`${displayDiscardButtonClass} bg-red-500 hover:bg-red-700 text-white font-bold py-0.5 md:py-3 px-3 rounded md:text-sm`}
       >
         Discard to Crib
       </button>
@@ -77,8 +81,8 @@ export default function Player({ name, player, turn, lobbyId, numPlayers, player
       className={`flex flex-col justify-center ${bgGradient} max-w-50 my-4 p-2 md:m-2 md:py-4 md:px-2 rounded-lg ${outlineStyle} transition-all duration-300 shadow-xl backdrop-blur-sm`}
     >
       <div className="flex items-center justify-center mb-1 md:mb-3">
-        <h1 className="text-base md:text-xl font-bold text-gray-800">{name}</h1>
-        {lobbyId && playerId === player.id && (
+        <h1 className="md:text-xl font-bold text-gray-800">{name}</h1>
+        {lobbyId && isPlayer && (
           <span className="bg-green-400 text-black px-2 rounded-full text-xs ml-2 italic">You</span>
         )}
       </div>

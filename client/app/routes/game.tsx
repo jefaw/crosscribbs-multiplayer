@@ -4,7 +4,7 @@ import RoundScore from "~/ui/Game/RoundScore";
 import GameOver from "~/ui/Game/GameOver";
 import TurnIndicator from "~/ui/Game/TurnIndicator";
 import RoundHistory from "~/ui/Game/RoundHistory";
-import BottomHud from "~/ui/Game/BottomHud";
+import Crib from "~/ui/Game/Crib";
 import { useEffect, useState } from "react";
 import type { GameStateType } from "@cross-cribbs/shared-types/GameControllerTypes";
 import type { BoardPosition } from "@cross-cribbs/shared-types/BoardTypes";
@@ -85,6 +85,12 @@ export default function Game() {
     }
   };
 
+  const cardSizes = {
+    base: "w-[54.075px] h-[75.6px] max-w-[54.075px] max-h-[75.6px]",
+    md: "md:w-[81.9px] md:h-[116.55px] md:max-h-[133.2px] md:max-w-[93.6px]",
+    xl: "xl:w-[93.6px] xl:h-[133.2px]",
+  };
+
   return (
     <div className="bg-green-600">
       <div className="flex flex-col md:flex-row relative h-screen items-center justify-center gap-7">
@@ -108,18 +114,29 @@ export default function Game() {
                 players={gameState.players}
                 turn={gameState.turn}
                 crib={gameState.crib}
+                cardSizes={cardSizes}
               ></PlayersDisplay>
-
-              <TurnIndicator turn={gameState.turn} playerNames={playerNames} dealer={gameState.dealer} />
+              <TurnIndicator
+                className="hidden md:block"
+                turn={gameState.turn}
+                playerNames={playerNames}
+                dealer={gameState.dealer}
+              />
             </div>
           </div>
         </div>
         <div className="w-full md:w-1/3">
-          <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} />
+          <Board board={gameState.board} playCard={playCard} turn={gameState.turn} cardSizes={cardSizes} />
         </div>
         <div className="w-full md:w-1/3">
-          {/* <Board board={gameState.board} selectedCard={gameState.selectedCard} playCard={playCard} /> */}
+          <div className="flex justify-center">
+            <div className="inline-flex flex-col items-center gap-10">
+              <Crib crib={gameState.crib} dealer={gameState.dealer} cardSizes={cardSizes} />
+              <RoundHistory roundHistory={gameState.roundHistory} />
+            </div>
+          </div>
         </div>
+
         {gameState.roundScoreVisible && !gameState.gameOver && (
           <RoundScore
             nextRound={nextRound}
@@ -142,7 +159,6 @@ export default function Game() {
           />
         )}
         {/* {!gameState.gameOver && <BottomHud gameState={gameState} playerNames={playerNames} />} */}
-        <RoundHistory roundHistory={gameState.roundHistory} />
       </div>
     </div>
   );
