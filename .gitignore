@@ -1,10 +1,14 @@
 .DS_Store
-/node_modules/
-/server/node_modules/
+node_modules
+client/node_modules/
+server/node_modules/
 
 # React Router
-/.react-router/
-/build/
+client/.react-router/
+client/build/
+
+# server
+/server/dist
 
 .specstory/
 .cursorindexingignore/

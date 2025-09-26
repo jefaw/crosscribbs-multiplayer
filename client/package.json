@@ -1,0 +1,41 @@
+{
+  "name": "crosscribbs-multiplayer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "react-router dev",
+    "build-server": "cd server && npm install && npm run build",
+    "build": "npm install && react-router build",
+    "start-server": "cd server && npm run start",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc"
+  },
+  "dependencies": {
+    "@cross-cribbs/shared-types": "file:../shared/types",
+    "@react-router/node": "^7.7.1",
+    "@react-router/serve": "^7.7.1",
+    "framer-motion": "^12.23.12",
+    "isbot": "^5.1.27",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router": "^7.7.1",
+    "react-router-dom": "^7.8.1",
+    "socket.io-client": "^4.8.1",
+    "tsconfig-paths": "^4.2.0"
+  },
+  "devDependencies": {
+    "@react-router/dev": "^7.7.1",
+    "@tailwindcss/vite": "^4.1.4",
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.19.11",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "concurrently": "^9.2.0",
+    "serve": "^14.2.5",
+    "tailwindcss": "^4.1.4",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.3",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}

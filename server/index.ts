@@ -8,8 +8,8 @@ import { fileURLToPath } from "url";
 import GameController from "./gameController.js";
 import { getGame, lobbies, games, deleteGame } from "./classes/gameHelpers.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -173,6 +173,20 @@ io.on("connection", (socket) => {
     const success = game.discardToCrib(numPlayers, player, card, playerId);
     if (success) {
       io.emit("gameStateUpdate", game.getGameState());
+    }
+  });
+
+  socket.on("rejoinGame", ({ lobbyId, playerId }) => {
+    const game = getGame(socket.id, lobbyId);
+    if (game) {
+      // Update the player's socket mapping
+      // Re-join the socket to the correct room for future broadcasts
+      socket.join(lobbyId);
+      // Send the latest state to the re-joining player
+      socket.emit("gameStateUpdate", game.getGameState());
+    } else {
+      // Handle case where the lobby doesn't exist
+      socket.emit("error", { message: "Lobby not found." });
     }
   });
 

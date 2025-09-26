@@ -1,5 +1,5 @@
 import Card from "./Card.js";
-import type { CardType } from "@shared/types/CardType.js";
+import type { CardType } from "@cross-cribbs/shared-types/CardType.js";
 
 export default class Deck {
   deck: CardType[] = [];

@@ -1,5 +1,5 @@
-import { CARD_NAME, CARD_VAL, SUITS } from "@shared/types/CardType.js";
-import type { CardType, CardName, CardValue, Suit } from "@shared/types/CardType.js";
+import { CARD_NAME, CARD_VAL, SUITS } from "@cross-cribbs/shared-types/CardType.js";
+import type { CardType, CardName, CardValue, Suit } from "@cross-cribbs/shared-types/CardType.js";
 
 export default class Card implements CardType {
   id: number;

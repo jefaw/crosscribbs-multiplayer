@@ -16,3 +16,9 @@ export interface CardType {
   suit: Suit;
   frontImgSrc: string;
 }
+
+export interface CardSizesType {
+  base: string;
+  md: string;
+  xl: string;
+}

@@ -1,7 +1,7 @@
 import Card from "./Card.js";
 import Score from "./Score.js";
-import type { CardType, CardValue } from "@shared/types/CardType.js";
-import type { BoardType } from "@shared/types/GameControllerTypes.js";
+import type { CardType, CardValue } from "@cross-cribbs/shared-types/CardType.js";
+import type { BoardType } from "@cross-cribbs/shared-types/GameControllerTypes.js";
 
 function newBoard() {
   let board: BoardType = [];
