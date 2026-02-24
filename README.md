@@ -4,5 +4,5 @@
 
 Updated repo here: https://github.com/BenDaBeast22/crosscribbs-multiplayer
 
-Try game here:
-https://cross-cribbs.up.railway.app/
+### Try game here:
+https://crosscribbs-multiplayer.onrender.com
